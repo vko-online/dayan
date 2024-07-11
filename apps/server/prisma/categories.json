@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Construction and finishing",
+    "description": "Plasterers, tilers, roofing, etc.",
+    "children": [
+      {
+        "name": "Services of painters and plasterers",
+        "children": [
+          {
+            "name": "Grouting the surface"
+          },
+          {
+            "name": "Surface painting"
+          },
+          {
+            "name": "Whitewashing the surface"
+          },
+          {
+            "name": "Plaster surface"
+          },
+          {
+            "name": "Decorative plaster"
+          },
+          {
+            "name": "Surface primer"
+          },
+          {
+            "name": "gesso surface"
+          },
+          {
+            "name": "Finishing surface putty"
+          },
+          {
+            "name": "Surface putty"
+          },
+          {
+            "name": "Mesh reinforcement"
+          }
+        ]
+      },
+      {
+        "name": "Working with tiles and tiles"
+      }
+    ]
+  },
+  {
+    "name": "Household repairs",
+    "description": "Plumbers, electricians, furniture makers, etc."
+  },
+  {
+    "name": "Help around the house",
+    "description": "Cleaning, dry cleaning, gardeners, etc."
+  },
+  {
+    "name": "Cleaning and sanitation",
+    "description": "Work at heights, Territory cleaning"
+  },
+  {
+    "name": "Equipment repair and installation",
+    "description": "Household, computer, alarm, etc."
+  },
+  {
+    "name": "Freight and delivery",
+    "description": "Gazelles, couriers, loaders, etc."
+  },
+  {
+    "name": "Making and craft",
+    "description": "3D printing, Airbrush, Key making, Furniture making"
+  },
+  {
+    "name": "Special equipment services",
+    "description": "Car transporter services, Aerial platform services, Truck crane services"
+  },
+  {
+    "name": "IT and freelancers",
+    "description": "Developers, designers, smm, photographers, etc."
+  },
+  {
+    "name": "Health services",
+    "description": "Nutritionists, speech therapists, nurses, psychotherapists"
+  },
+  {
+    "name": "Service station and car services",
+    "description": "On-site assistance for cars, Detailing services, Oil and fluid changes"
+  },
+  {
+    "name": "Beauty services",
+    "description": "Massage, hair removal, eyebrow, nail care, etc."
+  },
+  {
+    "name": "Drivers and couriers",
+    "description": "Couriers, Intercity taxi, City taxi, Transfer"
+  },
+  {
+    "name": "Business services",
+    "description": "Accountants, lawyers, insurers, etc."
+  },
+  {
+    "name": "Other services",
+    "description": "Detectives, Doulas, Help for an hour, Metal reception, Funeral services"
+  },
+  {
+    "name": "Holidays and events",
+    "description": "Actors, Bartenders, Catering, Confectioners and bakers, Turnkey events"
+  },
+  {
+    "name": " Tutors",
+    "description": "Languages, school subjects, etc."
+  },
+  {
+    "name": " Courses and trainings",
+    "description": "Acting courses, Video editing courses, Knitting courses"
+  },
+  {
+    "name": " Animal services",
+    "description": "Aquarists, Veterinarians, Animal walking, Dog handlers and trainers"
+  },
+  {
+    "name": " Sports trainers",
+    "description": "Aikido, Rowing, Acrobatics, American Football"
+  }
+]

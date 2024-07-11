@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator typegraphql {
+  provider = "typegraphql-prisma"
+  output   = "../src/generated/type-graphql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  USER
+}
+
+enum VerificationStatus {
+  VERIFIED
+  UNVERIFIED
+  VERIFICATION_IN_PROGRESS
+}
+
+model Verification {
+  id     String             @id @default(cuid())
+  status VerificationStatus
+  userId String
+  user   User?              @relation(name: "UserVerification")
+}
+
+model User {
+  id    String @id @default(cuid())
+  phone String @unique
+
+  pushId String?
+  role   Role?   @default(USER)
+
+  verificationId String?       @unique
+  verification   Verification? @relation(name: "UserVerification", fields: [verificationId], references: [id])
+
+  name         String?
+  photo        String?
+  followingIds String[] // ProfileCategory
+
+  messages      Message[]      @relation(name: "UserMessages")
+  conversations Conversation[] @relation(name: "UserConversations")
+  notifications Notification[] @relation(name: "UserNotifications")
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  text      String
+  serviceId String
+  // target user id to give review for, not profile
+  userId    String
+  stars     Int
+  authorId  String
+  images    String[]
+}
+
+enum ActivityType {
+  SERVICE_STATUS_CHANGED
+  REVIEW_RECEIVED
+  AUTHENTICATED
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  text      String
+  type      ActivityType
+  authorId  String
+  userId    String?
+}
+
+model Otp {
+  id        String   @id @default(cuid())
+  phone     String   @unique
+  pin       String
+  createdAt DateTime @default(now())
+  expiredAt DateTime
+}
+
+enum NotificationType {
+  NEW_EVENT
+  NEW_ACTIVITY
+  NEW_MESSAGE
+  SYSTEM
+  PROMO
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  createdAt DateTime         @default(now())
+  title     String?
+  content   String?
+  url       String?
+  imageUrl  String?
+  type      NotificationType
+  userId    String
+  user      User             @relation(name: "UserNotifications", references: [id], fields: [userId])
+}
+
+model Conversation {
+  id                 String    @id @default(cuid())
+  createdAt          DateTime  @default(now())
+  members            User[]    @relation(name: "UserConversations")
+  messages           Message[] @relation(name: "ConversationMessages")
+  lastMessageContent String?
+  lastMessageDate    DateTime?
+  lastMessageAuthor  String?
+}
+
+model UserCategory {
+  categoryId  String
+  userId   String
+  price       Int?
+  description String?
+
+  @@id([userId, categoryId])
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  image       String?
+  parentId    String?
+}
+
+enum ServiceStatus {
+  CREATED
+  IN_PROGRESS
+  AWAITING_REVIEW
+  FINISHED
+}
+
+enum PaymentType {
+  FIXED
+  FLEXIBLE
+  NEGOTIATABLE
+  HOURLY
+}
+
+enum Payment {
+  CASH
+  BANK_TRANSFER
+  APPLE_PAY
+}
+
+enum State {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Service {
+  id          String        @id @default(cuid())
+  createdAt   DateTime      @default(now())
+  title       String
+  description String
+  price       Int?
+  paymentType PaymentType? @default(FIXED)
+  payment     Payment? @default(CASH)
+  date        DateTime?
+  status      ServiceStatus @default(CREATED)
+  state       State @default(DRAFT)
+  address     String?
+  city        String?       @default("Auckland")
+  latitude    Decimal? // use postgis geo query
+  longitude   Decimal?
+  images      String[]
+  authorId    String
+  executorId  String? // person who completes the job
+  categoryId  String?
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  createdAt      DateTime     @default(now())
+  content        String
+  authorId       String
+  author         User         @relation(name: "UserMessages", references: [id], fields: [authorId])
+  readByIds      String[]
+  receivedByIds  String[]
+  files          String[]
+  conversationId String
+  conversation   Conversation @relation(name: "ConversationMessages", references: [id], fields: [conversationId])
+}
+
+
+// todo: remove File model, all assets should be stored in s3
+model File {
+  id         String    @id @default(cuid())
+  name       String
+  size       Int
+  path       String
+  type       String
+}
+
+// enum FeedbackType {
+//   IDEA
+//   FEATURE
+//   BUG
+// }
+
+// model Feedback {
+//   id        String       @id @default(cuid())
+//   createdAt DateTime     @default(now())
+//   email     String?
+//   text      String
+//   type      FeedbackType
+// }

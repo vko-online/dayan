@@ -1,0 +1,9 @@
+{
+  "name": "dayan",
+  "version": "1.0.0",
+  "description": "dayan",
+  "author": "Medet Tleukabiluly",
+  "workspaces": [
+    "apps/*"
+  ]
+}

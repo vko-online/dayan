@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
+        "lib": ["es2018", "esnext.asynciterable"],
+        "strictNullChecks": true,
+        "module": "CommonJS",
+        "target": "es2018",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "strict": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+        "baseUrl": ".",
+        "paths": {
+            "src": ["src"]
+        }
+    },
+    "ts-node": {
+        "require": ["tsconfig-paths/register"]
+    },
+    "ts-node-dev": {
+        "require": ["tsconfig-paths/register"]
+    }
+}

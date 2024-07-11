@@ -1,0 +1,5 @@
+mutation sendOTP ($input: SendCodeInput!) {
+  sendOTP (input: $input) {
+    success
+  }
+}

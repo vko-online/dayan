@@ -1,0 +1,4 @@
+fragment ProfileParts on User {
+  id
+  name
+}

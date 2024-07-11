@@ -1,0 +1,106 @@
+import { Upload, FileUpload } from 'graphql-upload'
+import { Context } from 'src/context'
+import { File, User } from 'src/generated/type-graphql'
+import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
+import { deleteFileById, saveFile } from 'src/services/fileUpload'
+import { ApolloError } from 'apollo-server'
+
+@InputType()
+class UpdateImageInput {
+  @Field(() => Upload, { nullable: false })
+    file!: FileUpload
+
+  @Field(() => String, { nullable: false })
+    id!: string
+}
+
+@InputType()
+class PresenceInput {
+  @Field(() => Boolean, { nullable: true })
+    online?: boolean
+}
+
+@Resolver()
+export default class MeResolver {
+  @Authorized()
+  @Mutation(() => Boolean)
+  async updatePresence (
+    @Arg('input', () => PresenceInput) input: PresenceInput,
+      @Ctx() context: Context
+  ): Promise<boolean> {
+    // await updateUser({
+    //   id: context.currentUserId as string,
+    //   online: input.online ?? false
+    // })
+    return true
+  }
+
+  @Authorized()
+  @Mutation(() => [File])
+  async uploadImage (
+    @Arg('input', () => [Upload]) input: FileUpload[],
+      @Ctx() context: Context
+  ): Promise<File[]> {
+    const files: File[] = []
+    for (const item of input) {
+      const file = await saveFile(item)
+      const profile = await context.prisma.profile.findFirst({
+        where: {
+          userId: context.currentUserId as string
+        }
+      })
+
+      if (profile) {
+        await context.prisma.profile.update({
+          where: {
+            id: profile.id
+          },
+          data: {
+            photo: file.id
+          }
+        })
+      }
+      files.push(file)
+    }
+    return files
+  }
+
+  @Authorized()
+  @Mutation(() => [File])
+  async updateImage (
+    @Arg('input', () => UpdateImageInput) input: UpdateImageInput,
+      @Ctx() context: Context
+  ): Promise<File> {
+    const profile = await context.prisma.profile.findFirst({
+      where: {
+        id: context.currentUserId as string
+      }
+    })
+    if (profile) {
+      if (profile.photo != null) {
+        await deleteFileById(profile.photo)
+      }
+      const file = await saveFile(input.file)
+      await context.prisma.profile.update({
+        where: {
+          id: profile.id
+        },
+        data: {
+          photo: file.id
+        }
+      })
+      return file
+    }
+    throw new ApolloError('Profile not found')
+  }
+
+  @Authorized()
+  @Query(() => User, { nullable: true })
+  async me (@Ctx() context: Context): Promise<User | null> {
+    return await context.prisma.user.findFirst({
+      where: {
+        id: context.currentUserId as string
+      }
+    })
+  }
+}
