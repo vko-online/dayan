@@ -1,18 +1,17 @@
-import { type PrismaClient } from '@prisma/client'
-import { redis } from 'src/services/redis'
-import { prisma } from 'src/services/prisma'
-import jwt from 'jsonwebtoken'
 import { type RedisPubSub } from 'graphql-redis-subscriptions'
 import { type Context as WsContext } from 'graphql-ws'
-import { UnauthorizedError } from 'type-graphql'
+import jwt from 'jsonwebtoken'
+import { ExtendedPrismaClient, prisma } from 'src/services/prisma'
+import { redis } from 'src/services/redis'
+import { AuthorizationError } from 'type-graphql'
 
 export interface Context {
-  prisma: PrismaClient
+  prisma: ExtendedPrismaClient
   currentUserId: string | null
   pubsub: RedisPubSub
 }
 
-async function buildContext (bearerToken: string | undefined | null): Promise<Context> {
+async function buildContext(bearerToken: string | undefined | null): Promise<Context> {
   let currentUserId = null
   if (bearerToken?.includes('Bearer') === true) {
     const token = bearerToken.replace('Bearer ', '')
@@ -25,7 +24,7 @@ async function buildContext (bearerToken: string | undefined | null): Promise<Co
     if (usr != null) {
       currentUserId = verified as string
     } else {
-      throw new UnauthorizedError()
+      throw new AuthorizationError()
     }
   }
   return {
@@ -35,10 +34,10 @@ async function buildContext (bearerToken: string | undefined | null): Promise<Co
   }
 }
 
-export async function createContext ({ req }: { req: any }): Promise<Context> {
+export async function createContext({ req }: { req: any }): Promise<Context> {
   return await buildContext(req.headers.authorization)
 }
 
-export async function createWsContext (ctx: WsContext): Promise<Context> {
+export async function createWsContext(ctx: WsContext): Promise<Context> {
   return await buildContext(ctx?.connectionParams?.authorization as string)
 }

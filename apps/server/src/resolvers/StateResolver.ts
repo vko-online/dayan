@@ -5,20 +5,23 @@ import { Resolver, InputType, Field, Arg, Ctx, Authorized, Mutation } from 'type
 @InputType()
 class StateInput {
   @Field(() => Boolean, { nullable: false })
-    online!: boolean
+  online!: boolean
 
   @Field(() => Number, { nullable: false })
-    latitude!: number
+  latitude!: number
 
   @Field(() => Number, { nullable: false })
-    longitude!: number
+  longitude!: number
 }
 
 @Resolver()
 export default class StateResolver {
   @Authorized()
   @Mutation(() => Boolean, { nullable: true }) // prisma resolver
-  async updateState (@Arg('input', type => StateInput) input: StateInput, @Ctx() context: Context): Promise<boolean> {
+  async updateState(
+    @Arg('input', type => StateInput) input: StateInput,
+    @Ctx() context: Context
+  ): Promise<boolean> {
     // await context.prisma.user.update({
     //   where: {
     //     id: context.currentUserId as string

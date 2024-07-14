@@ -1,5 +1,4 @@
 import { Resolver } from 'type-graphql'
 
 @Resolver()
-export default class OnboardingResolver {
-}
+export default class OnboardingResolver {}

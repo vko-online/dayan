@@ -1,19 +1,18 @@
-
-import { Context } from 'src/context'
-import { Resolver, InputType, Field, Arg, Ctx, Mutation, Authorized } from 'type-graphql'
-import { sendOrPublish } from 'src/services/broker'
 import { PROMO } from 'src/constants/topics'
+import { Context } from 'src/context'
+import { sendOrPublish } from 'src/services/broker'
+import { Resolver, InputType, Field, Arg, Ctx, Mutation, Authorized } from 'type-graphql'
 
 @InputType()
 class PushCampaignInput {
   @Field(() => String, { nullable: false })
-    content!: string
+  content!: string
 
   @Field(() => String, { nullable: false })
-    title!: string
+  title!: string
 
   @Field(() => [String], { nullable: false })
-    userIds!: string[]
+  userIds!: string[]
 }
 
 @Resolver()
@@ -21,7 +20,10 @@ export default class NotificationResolver {
   // todo: allow only for admins
   @Authorized('ADMIN')
   @Mutation(() => Number, { nullable: false })
-  async sendNotification (@Arg('input', type => PushCampaignInput) input: PushCampaignInput, @Ctx() context: Context): Promise<number> {
+  async sendNotification(
+    @Arg('input', type => PushCampaignInput) input: PushCampaignInput,
+    @Ctx() context: Context
+  ): Promise<number> {
     await sendOrPublish({
       data: {
         content: input.content,

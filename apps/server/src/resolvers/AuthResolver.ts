@@ -1,48 +1,51 @@
+import { addDays } from 'date-fns'
+import { GraphQLError } from 'graphql'
+import jwt from 'jsonwebtoken'
 import { Context } from 'src/context'
 import { User } from 'src/generated/type-graphql'
-import jwt from 'jsonwebtoken'
-import { addDays } from 'date-fns'
 import { Resolver, Mutation, InputType, ObjectType, Field, Arg, Ctx } from 'type-graphql'
-import { AuthenticationError } from 'apollo-server-core'
 // import { VoidMock } from 'graphql-scalars'
 
 @ObjectType()
 class SendCodePayload {
   @Field()
-    success!: boolean
+  success!: boolean
 }
 
 @ObjectType()
 class CheckCodePayload {
   @Field()
-    token!: string
+  token!: string
 
   @Field(() => User)
-    user!: User
+  user!: User
 }
 
 @InputType()
 class SendCodeInput {
   @Field({ nullable: false })
-    phone!: string
+  phone!: string
 }
 
 @InputType()
 class CheckCodeInput {
   @Field({ nullable: false })
-    phone!: string
+  phone!: string
 
   @Field(() => String, { nullable: true })
-    deviceOS?: string
+  deviceOS?: string
 
   @Field({ nullable: false })
-    code!: string
+  code!: string
 }
 
 @Resolver()
 export default class AuthResolver {
   @Mutation(() => SendCodePayload)
-  async sendOTP (@Arg('input', { nullable: false }) { phone }: SendCodeInput, @Ctx() context: Context): Promise<SendCodePayload> {
+  async sendOTP(
+    @Arg('input', { nullable: false }) { phone }: SendCodeInput,
+    @Ctx() context: Context
+  ): Promise<SendCodePayload> {
     const user = await context.prisma.user.findFirst({ where: { phone } })
     if (user == null) {
       await context.prisma.user.create({
@@ -81,7 +84,10 @@ export default class AuthResolver {
   }
 
   @Mutation(() => CheckCodePayload)
-  async checkOTP (@Arg('input', { nullable: false }) { code, phone, deviceOS }: CheckCodeInput, @Ctx() context: Context): Promise<CheckCodePayload | AuthenticationError> {
+  async checkOTP(
+    @Arg('input', { nullable: false }) { code, phone, deviceOS }: CheckCodeInput,
+    @Ctx() context: Context
+  ): Promise<CheckCodePayload | GraphQLError> {
     const user = await context.prisma.user.findFirst({ where: { phone } })
     const existingCode = await context.prisma.otp.findFirst({
       where: {
@@ -91,7 +97,7 @@ export default class AuthResolver {
     })
 
     if (user == null) {
-      return new AuthenticationError('User doesn\'t exist')
+      return new GraphQLError("User doesn't exist")
     }
 
     if (existingCode != null) {
@@ -107,11 +113,11 @@ export default class AuthResolver {
         user
       }
     }
-    return new AuthenticationError('Invalid OTP code')
+    return new GraphQLError('Invalid OTP code')
   }
 
   @Mutation(() => Boolean, { nullable: true })
-  async signOut (@Ctx() context: Context): Promise<boolean> {
+  async signOut(@Ctx() context: Context): Promise<boolean> {
     await context.prisma.user.update({
       where: {
         id: context.currentUserId as string

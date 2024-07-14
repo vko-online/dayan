@@ -1,26 +1,26 @@
-import { Args, Field, ArgsType, Resolver, Root, Subscription, Authorized } from 'type-graphql'
-import { redis } from 'src/services/redis'
 import { NEW_MESSAGE } from 'src/constants/topics'
-import { withFilter } from 'graphql-subscriptions'
+import { Args, Field, ArgsType, Resolver, Root, Subscription, Authorized } from 'type-graphql'
+
 import { MessageWithTargetIds } from './ConversationResolver'
 
 @ArgsType()
 class GenericListenerArgs {
   @Field()
-    currentUserId!: string
+  currentUserId!: string
 }
 
 @Resolver()
 export default class SubscriptionsResolver {
   @Authorized()
   @Subscription(() => MessageWithTargetIds, {
-    subscribe: withFilter(() => redis.asyncIterator(NEW_MESSAGE), (payload: MessageWithTargetIds, variables: GenericListenerArgs) => {
-      return payload.targetId === variables.currentUserId
-    })
+    topics: NEW_MESSAGE,
+    filter: ({ payload, args }) => {
+      return payload.targetId === args.currentUserId
+    }
   })
-  async newMessage (
+  async newMessage(
     @Root() payload: MessageWithTargetIds,
-      @Args() args: GenericListenerArgs
+    @Args() args: GenericListenerArgs
   ): Promise<MessageWithTargetIds> {
     return payload
   }

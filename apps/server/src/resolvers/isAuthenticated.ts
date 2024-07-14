@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 import { type User } from 'src/generated/type-graphql'
 import { prisma } from 'src/services/prisma'
 
-export default async function isAuthenticated (token?: string): Promise<User | null> {
+export default async function isAuthenticated(token?: string): Promise<User | null> {
   try {
     if (token != null && token.length > 0) {
       const rawToken = token.replace('Bearer ', '')

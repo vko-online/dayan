@@ -1,47 +1,68 @@
-import { type FileUpload, Upload } from 'graphql-upload'
+import { TaskLocation } from '@prisma/client'
+import Upload, { FileUpload } from 'graphql-upload/Upload.mjs'
 import { Context } from 'src/context'
-import { Payment, type File, PaymentType, Service } from 'src/generated/type-graphql'
+import { type File, Task, TaskPayment, TaskPaymentType } from 'src/generated/type-graphql'
 import { saveFile } from 'src/services/fileUpload'
-import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver, FieldResolver, Root } from 'type-graphql'
+
+class LocationWithAltitudeInput {
+  @Field()
+  altitude!: number
+
+  @Field()
+  latitude!: number
+
+  @Field()
+  longitude!: number
+}
+
+class LocationInput {
+  @Field()
+  latitude!: number
+
+  @Field()
+  longitude!: number
+}
 
 @InputType()
-class ServiceInput {
+class TaskInput {
   @Field()
-    description!: string
+  description!: string
 
   @Field({ nullable: true })
-    price?: number
+  price?: number
 
   @Field({ nullable: true })
-    paymentType?: PaymentType
+  paymentType?: TaskPaymentType
+
+  // cash only for now
+  // @Field({ nullable: true })
+  //   payment?: Payment
 
   @Field({ nullable: true })
-    payment?: Payment
+  date?: Date
 
   @Field({ nullable: true })
-    date?: Date
+  address?: string
 
   @Field({ nullable: true })
-    address?: string
+  location?: LocationWithAltitudeInput
 
   @Field({ nullable: true })
-    latitude?: number
-
-  @Field({ nullable: true })
-    longitude?: number
-
-  @Field({ nullable: true })
-    categoryId?: string
+  categoryId?: string
 
   @Field(() => [Upload], { nullable: true })
-    images?: FileUpload[]
+  images?: FileUpload[]
 }
 
 @Resolver()
 export default class MatchmakingResolver {
   @Authorized()
-  @Mutation(() => Service)
-  async createService (@Arg('data', () => ServiceInput, { nullable: false }) data: ServiceInput, @Ctx() context: Context): Promise<Service> {
+  @Mutation(() => Task)
+  async createTask(
+    @Arg('data', () => TaskInput, { nullable: false }) data: TaskInput,
+    @Ctx() context: Context
+  ): Promise<Task> {
     const files: File[] = []
     if (data.images) {
       for (const item of data.images) {
@@ -50,16 +71,14 @@ export default class MatchmakingResolver {
       }
     }
 
-    const service = await context.prisma.service.create({
+    const task = await context.prisma.task.create({
       data: {
-        title: data.categoryId ?? 'Service',
+        title: data.categoryId ?? '',
         address: data.address,
         categoryId: data.categoryId,
         date: data.date,
-        latitude: data.latitude,
-        longitude: data.longitude,
         paymentType: data.paymentType,
-        payment: data.payment,
+        payment: TaskPayment.CASH,
         status: 'CREATED',
         price: data.price,
         description: data.description,
@@ -68,17 +87,39 @@ export default class MatchmakingResolver {
       }
     })
 
+    await context.prisma.taskLocation.create({
+      taskId: task.id,
+      altitude: data.location?.altitude ?? 0,
+      location: {
+        latitude: data.location?.latitude ?? 0,
+        longitude: data.location?.longitude ?? 0,
+      }
+    })
+
     // todo: emit to categoryId followers
 
-    return service
+    return task
   }
 
   @Authorized()
-  @Query(() => [Service])
-  async availableServices (@Ctx() context: Context): Promise<Service[]> {
-    return await context.prisma.service.findMany({
+  @Query(() => [Task])
+  async availableTasks(@Ctx() context: Context): Promise<Task[]> {
+    return await context.prisma.task.findMany({
       where: {
         status: 'CREATED'
+      }
+    })
+  }
+
+  @Authorized()
+  @Query(() => [Task])
+  async findClosestTasks(@Ctx() context: Context, @Arg('location', () => LocationInput) location: LocationInput): Promise<Task[]> {
+    const taskLocations = await context.prisma.taskLocation.findClosestPoints(location.latitude, location.longitude)
+    return await context.prisma.task.findMany({
+      where: {
+        id: {
+          in: taskLocations.map(v => v.taskId)
+        }
       }
     })
   }

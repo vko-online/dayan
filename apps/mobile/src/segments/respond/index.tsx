@@ -1,7 +1,7 @@
-import React, { forwardRef, useState } from 'react'
+import React, { forwardRef } from 'react'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { BottomSheetModal, BottomSheetTextInput } from '@gorhom/bottom-sheet'
-import { Button, Input } from '@rneui/themed'
+import { BottomSheetModal } from '@gorhom/bottom-sheet'
+import { Button } from '@rneui/themed'
 
 import BlurredBackground from 'src/components/BlurredBackground'
 import Box from 'src/components/Box'

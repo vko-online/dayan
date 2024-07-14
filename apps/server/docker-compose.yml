@@ -1,4 +1,3 @@
-version: '3.9'
 name: dayan_dev_container
 services:
   redis:
@@ -12,7 +11,8 @@ services:
     restart: always
   postgres:
     container_name: postgres_container
-    image: postgis/postgis
+    image: imresamu/postgis-arm64 #postgis/postgis
+    platform: linux/arm64/v8
     ports:
       - 5432:5432
     volumes:

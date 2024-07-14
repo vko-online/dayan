@@ -20,7 +20,7 @@ if (process.env.NODE_ENV === 'production') {
   })
 } else {
   if ((global as any).redis == null) {
-    (global as any).redis = new RedisPubSub({
+    ;(global as any).redis = new RedisPubSub({
       publisher: new Redis(redisOptions),
       subscriber: new Redis(redisOptions)
     })

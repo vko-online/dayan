@@ -63,7 +63,7 @@ const SearchHandleComponent = ({
       <View style={[s.indicator, { backgroundColor: theme.colors.divider }]} />
       <Box flexDirection='row' gap={10} alignItems='center'>
         <BottomSheetTextInput
-          style={s.input}
+          style={[s.input, { color: theme.colors.black }]}
           value={value}
           textContentType='location'
           clearButtonMode='never'
@@ -86,7 +86,7 @@ const SearchHandleComponent = ({
   )
 }
 
-export const s = StyleSheet.create({
+const s = StyleSheet.create({
   indicator: {
     marginTop: 5,
     alignSelf: 'center',

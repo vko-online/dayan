@@ -64,7 +64,7 @@ const CardHandleComponent = ({ title, subtitle, onClose, onPress }: CardHandlePr
   )
 }
 
-export const s = StyleSheet.create({
+const s = StyleSheet.create({
   indicator: {
     marginVertical: 5,
     alignSelf: 'center',

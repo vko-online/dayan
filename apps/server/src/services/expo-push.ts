@@ -4,7 +4,14 @@
 // if you receive DeviceNotRegistered and keep sending
 // app will be blocked, so need to remove token from user table
 
-import { Expo, type ExpoPushErrorReceipt, type ExpoPushMessage, type ExpoPushSuccessTicket, type ExpoPushTicket } from 'expo-server-sdk'
+import {
+  Expo,
+  type ExpoPushErrorReceipt,
+  type ExpoPushMessage,
+  type ExpoPushSuccessTicket,
+  type ExpoPushTicket
+} from 'expo-server-sdk'
+
 import { removePushId } from './prisma'
 // Create a new Expo SDK client
 // optionally providing an access token if you have enabled push security
@@ -18,7 +25,7 @@ const expo = new Expo({ accessToken: process.env.EXPO_ACCESS_TOKEN })
 // and to compress them (notifications with similar content will get
 // compressed).
 let tickets: ExpoPushTicket[] = []
-export async function sendPushNotification (messages: ExpoPushMessage[]): Promise<void> {
+export async function sendPushNotification(messages: ExpoPushMessage[]): Promise<void> {
   const chunks = expo.chunkPushNotifications(messages)
   // Send the chunks to the Expo push notification service. There are
   // different strategies you could use. A simple one is to send one chunk at a
@@ -61,7 +68,7 @@ export async function sendPushNotification (messages: ExpoPushMessage[]): Promis
 // your app. Expo does not control this policy and sends back the feedback from
 // Apple and Google so you can handle it appropriately.
 
-export async function receiptCheck (): Promise<void> {
+export async function receiptCheck(): Promise<void> {
   const receiptIds = []
   for (const ticket of tickets) {
     // NOTE: Not all tickets have IDs; for example, tickets for notifications
@@ -95,7 +102,6 @@ export async function receiptCheck (): Promise<void> {
               // remove pushId from user
               // await prisma.user.update({
               //   where: {
-
               //   }
               // })
             }

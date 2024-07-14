@@ -39,7 +39,7 @@ const ProfileHandleComponent = ({ name, onClose }: ProfileHandleProps) => {
   )
 }
 
-export const s = StyleSheet.create({
+const s = StyleSheet.create({
   indicator: {
     marginVertical: 5,
     alignSelf: 'center',

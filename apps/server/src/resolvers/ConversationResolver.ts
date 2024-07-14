@@ -1,47 +1,57 @@
+import Filter from 'bad-words'
 import { NEW_MESSAGE } from 'src/constants/topics'
 import { Context } from 'src/context'
 import { Conversation, Message } from 'src/generated/type-graphql'
 import { sendOrPublish } from 'src/services/broker'
-import Filter from 'bad-words'
-import { Arg, Authorized, Ctx, Field, InputType, Mutation, ObjectType, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Authorized,
+  Ctx,
+  Field,
+  InputType,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver
+} from 'type-graphql'
 
 const sensitivityFilter = new Filter()
 
 @InputType()
 class ConversationInput {
   @Field()
-    conversationId!: string
+  conversationId!: string
 
   @Field()
-    content!: string
+  content!: string
 }
 
 @ObjectType()
 export class MessageWithTargetIds {
   @Field()
-    targetId!: string
+  targetId!: string
 
   @Field()
-    conversationId!: string
+  conversationId!: string
 
   @Field()
-    message!: Message
+  message!: Message
 
   @Field()
-    type!: string
+  type!: string
 }
 
 @ObjectType()
 export class BatchPayload {
   @Field()
-    count!: number
+  count!: number
 }
 
 @Resolver()
 export default class ConversationResolver {
   @Authorized()
   @Query(() => [Conversation])
-  async myConversations (@Ctx() context: Context): Promise<Conversation[]> {
+  async myConversations(@Ctx() context: Context): Promise<Conversation[]> {
     return await context.prisma.conversation.findMany({
       where: {
         members: {
@@ -59,7 +69,10 @@ export default class ConversationResolver {
   // this can be called from client, should remove it here
   @Authorized()
   @Mutation(() => BatchPayload)
-  async markAsRead (@Arg('messageIds', () => [String], { nullable: false }) messageIds: string[], @Ctx() context: Context): Promise<BatchPayload> {
+  async markAsRead(
+    @Arg('messageIds', () => [String], { nullable: false }) messageIds: string[],
+    @Ctx() context: Context
+  ): Promise<BatchPayload> {
     return await context.prisma.message.updateMany({
       where: {
         id: {
@@ -82,7 +95,10 @@ export default class ConversationResolver {
   // this can be called from client, should remove it here
   @Authorized()
   @Mutation(() => BatchPayload)
-  async markAsReceived (@Arg('messageIds', () => [String], { nullable: false }) messageIds: string[], @Ctx() context: Context): Promise<BatchPayload> {
+  async markAsReceived(
+    @Arg('messageIds', () => [String], { nullable: false }) messageIds: string[],
+    @Ctx() context: Context
+  ): Promise<BatchPayload> {
     return await context.prisma.message.updateMany({
       where: {
         id: {
@@ -104,17 +120,13 @@ export default class ConversationResolver {
 
   @Authorized()
   @Mutation(() => Message)
-  async sendMessage (@Arg('input') input: ConversationInput, @Ctx() context: Context): Promise<Message> {
+  async sendMessage(
+    @Arg('input') input: ConversationInput,
+    @Ctx() context: Context
+  ): Promise<Message> {
     const currentUser = await context.prisma.user.findFirst({
       where: {
         id: context.currentUserId as string
-      },
-      include: {
-        profile: {
-          select: {
-            name: true
-          }
-        }
       }
     })
 
@@ -148,7 +160,7 @@ export default class ConversationResolver {
         id: input.conversationId
       },
       data: {
-        lastMessageAuthor: currentUser?.profile?.name,
+        lastMessageAuthor: currentUser?.name,
         lastMessageContent: msg.content,
         lastMessageDate: msg.createdAt
       },
@@ -163,7 +175,9 @@ export default class ConversationResolver {
 
     // todo: redundant check here
     if (convo != null) {
-      const [targetId] = convo.members.map(v => v.id).filter(v => v !== context.currentUserId as string)
+      const [targetId] = convo.members
+        .map(v => v.id)
+        .filter(v => v !== (context.currentUserId as string))
 
       const messageWithTargetIds: MessageWithTargetIds = {
         targetId,
@@ -181,7 +195,7 @@ export default class ConversationResolver {
         message: {
           badge: 1,
           title: 'You have new message',
-          subtitle: `New message from ${(currentUser?.profile?.name ?? currentUser?.phone as string)}`,
+          subtitle: `New message from ${currentUser?.name ?? (currentUser?.phone as string)}`,
           body: 'New message'
         }
       })

@@ -42,7 +42,7 @@ export default function App() {
           display: props.errorMessage ? 'flex' : 'none'
         },
         inputStyle: {
-          fontSize: 16
+          fontSize: 18
         },
         inputContainerStyle: {
           borderBottomWidth: 0,

@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  extensions = [postgis]
 }
 
 generator typegraphql {
@@ -132,51 +134,55 @@ model Category {
   parentId    String?
 }
 
-enum ServiceStatus {
+enum TaskStatus {
   CREATED
   IN_PROGRESS
   AWAITING_REVIEW
   FINISHED
 }
 
-enum PaymentType {
+enum TaskPaymentType {
   FIXED
   FLEXIBLE
   NEGOTIATABLE
   HOURLY
 }
 
-enum Payment {
+enum TaskPayment {
   CASH
   BANK_TRANSFER
   APPLE_PAY
 }
 
-enum State {
+enum TaskState {
   DRAFT
   PUBLISHED
   ARCHIVED
 }
 
-model Service {
+model Task {
   id          String        @id @default(cuid())
   createdAt   DateTime      @default(now())
   title       String
   description String
   price       Int?
-  paymentType PaymentType? @default(FIXED)
-  payment     Payment? @default(CASH)
+  paymentType TaskPaymentType? @default(FIXED)
+  payment     TaskPayment? @default(CASH)
   date        DateTime?
-  status      ServiceStatus @default(CREATED)
-  state       State @default(DRAFT)
+  status      TaskStatus @default(CREATED)
+  state       TaskState @default(DRAFT)
   address     String?
-  city        String?       @default("Auckland")
-  latitude    Decimal? // use postgis geo query
-  longitude   Decimal?
   images      String[]
   authorId    String
   executorId  String? // person who completes the job
   categoryId  String?
+}
+
+model TaskLocation {
+  id          String        @id @default(cuid())
+  taskId      String
+  altitude  Float
+  location    Unsupported("geography(Point, 4326)")
 }
 
 model Message {
@@ -201,17 +207,3 @@ model File {
   path       String
   type       String
 }
-
-// enum FeedbackType {
-//   IDEA
-//   FEATURE
-//   BUG
-// }
-
-// model Feedback {
-//   id        String       @id @default(cuid())
-//   createdAt DateTime     @default(now())
-//   email     String?
-//   text      String
-//   type      FeedbackType
-// }

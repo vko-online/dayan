@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import { ScrollView, TextInput } from 'react-native'
+import { Pressable, ScrollView } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import { Button, Divider, Icon, Input, Slider, useTheme } from '@rneui/themed'
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native'
+import { Button, Icon, Input, useTheme } from '@rneui/themed'
 import { formatDate } from 'date-fns'
 import { Formik } from 'formik'
 import * as yup from 'yup'
@@ -9,6 +10,9 @@ import * as yup from 'yup'
 import Box from 'src/components/Box'
 import Surface from 'src/components/Surface'
 import { Text } from 'src/components/Text'
+import { NewTaskStackParamList } from 'src/navigation/types'
+
+import MapInput from './map-input'
 
 const validationSchema = yup.object().shape({
   description: yup.string().required('Description is required'),
@@ -16,6 +20,8 @@ const validationSchema = yup.object().shape({
 })
 
 const NewTaskScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<NewTaskStackParamList, 'Index'>>()
+  const route = useRoute<RouteProp<NewTaskStackParamList, 'Index'>>()
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
 
   const showDatePicker = () => {
@@ -30,12 +36,14 @@ const NewTaskScreen: React.FC = () => {
     console.warn('A date has been picked: ', date)
     hideDatePicker()
   }
+
   const { theme } = useTheme()
   return (
     <ScrollView
       style={{ backgroundColor: theme.colors.background }}
       contentInsetAdjustmentBehavior='always'>
       <Formik
+        validationSchema={validationSchema}
         initialValues={{
           date: new Date(),
           description: '',
@@ -49,7 +57,15 @@ const NewTaskScreen: React.FC = () => {
         }}
         onSubmit={console.log}>
         {({ values, handleChange, setFieldValue }) => (
-          <Box padding={10}>
+          <Box paddingHorizontal={10} paddingTop={20} paddingBottom={10}>
+            <MapInput
+              location={route.params?.location}
+              onPress={() =>
+                navigation.navigate('MapSelection', {
+                  location: route.params?.location
+                })
+              }
+            />
             <Text label>Description</Text>
             <Surface marginBottom={10} padding={0}>
               <Input
@@ -63,13 +79,15 @@ const NewTaskScreen: React.FC = () => {
             </Surface>
             <Box marginTop={15}>
               <Text label>Category</Text>
-              <Surface justifyContent='center' flexDirection='row'>
-                <Box flex={1} gap={10} flexDirection='row' alignItems='center'>
-                  <Icon name='directions-car' />
-                  <Text body>Transport</Text>
-                </Box>
-                <Icon name='chevron-right' />
-              </Surface>
+              <Pressable onPress={() => navigation.navigate('CategorySelection')}>
+                <Surface justifyContent='center' flexDirection='row'>
+                  <Box flex={1} gap={10} flexDirection='row' alignItems='center'>
+                    <Icon name='directions-car' />
+                    <Text body>Transport</Text>
+                  </Box>
+                  <Icon name='chevron-right' />
+                </Surface>
+              </Pressable>
             </Box>
             <Box marginTop={15}>
               <Text label>When</Text>

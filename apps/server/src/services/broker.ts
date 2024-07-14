@@ -1,9 +1,10 @@
 // send push or pubsub
 
-import { redis } from './redis'
-import { prisma } from './prisma'
 import { type ExpoPushMessage } from 'expo-server-sdk'
+
 import { sendPushNotification } from './expo-push'
+import { prisma } from './prisma'
+import { redis } from './redis'
 
 interface Input<T> {
   to: string | string[]
@@ -15,7 +16,7 @@ interface Input<T> {
 // todo: incorrect implementation
 // we should send push anyway
 // then in the app, device to show local notification or in-app
-export async function sendOrPublish<T> (input: Input<T>): Promise<void> {
+export async function sendOrPublish<T>(input: Input<T>): Promise<void> {
   const users = await prisma.user.findMany({
     where: {
       id: {
@@ -26,7 +27,7 @@ export async function sendOrPublish<T> (input: Input<T>): Promise<void> {
       }
     }
   })
-  const msgs = users.map((user) => ({
+  const msgs = users.map(user => ({
     to: user.pushId as string,
     badge: input.message.badge,
     body: input.message.body,

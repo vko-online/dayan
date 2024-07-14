@@ -1,0 +1,8 @@
+query SearchCategory ($input: CategoryQueryInput!) {
+  searchCategory (input: $input) {
+    id
+    name
+    description
+    image
+  }
+}

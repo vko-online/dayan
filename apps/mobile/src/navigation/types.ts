@@ -10,7 +10,7 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<MainStackParamList>
   Auth: undefined
   GalleryPreview: undefined
-  NewTask: undefined
+  NewTask: NavigatorScreenParams<NewTaskStackParamList>
 }
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -20,4 +20,20 @@ export type RootStackScreenProps<Screen extends keyof RootStackParamList> = Nati
 
 export type MainStackParamList = {
   Index: undefined
+}
+
+export type MapLocation = {
+  altitude: number | undefined
+  latitude: number | undefined
+  longitude: number | undefined
+}
+
+export type NewTaskStackParamList = {
+  Index: {
+    location: MapLocation | undefined
+  }
+  MapSelection: {
+    location: MapLocation | undefined
+  }
+  CategorySelection: undefined
 }

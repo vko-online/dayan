@@ -1,32 +1,31 @@
-import { Upload, FileUpload } from 'graphql-upload'
+import Upload, { FileUpload } from 'graphql-upload/Upload.mjs'
 import { Context } from 'src/context'
 import { File, User } from 'src/generated/type-graphql'
-import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 import { deleteFileById, saveFile } from 'src/services/fileUpload'
-import { ApolloError } from 'apollo-server'
+import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 
 @InputType()
 class UpdateImageInput {
   @Field(() => Upload, { nullable: false })
-    file!: FileUpload
+  file!: FileUpload
 
   @Field(() => String, { nullable: false })
-    id!: string
+  id!: string
 }
 
 @InputType()
 class PresenceInput {
   @Field(() => Boolean, { nullable: true })
-    online?: boolean
+  online?: boolean
 }
 
 @Resolver()
 export default class MeResolver {
   @Authorized()
   @Mutation(() => Boolean)
-  async updatePresence (
+  async updatePresence(
     @Arg('input', () => PresenceInput) input: PresenceInput,
-      @Ctx() context: Context
+    @Ctx() context: Context
   ): Promise<boolean> {
     // await updateUser({
     //   id: context.currentUserId as string,
@@ -37,21 +36,21 @@ export default class MeResolver {
 
   @Authorized()
   @Mutation(() => [File])
-  async uploadImage (
+  async uploadImage(
     @Arg('input', () => [Upload]) input: FileUpload[],
-      @Ctx() context: Context
+    @Ctx() context: Context
   ): Promise<File[]> {
     const files: File[] = []
     for (const item of input) {
       const file = await saveFile(item)
-      const profile = await context.prisma.profile.findFirst({
+      const profile = await context.prisma.user.findFirst({
         where: {
-          userId: context.currentUserId as string
+          id: context.currentUserId as string
         }
       })
 
       if (profile) {
-        await context.prisma.profile.update({
+        await context.prisma.user.update({
           where: {
             id: profile.id
           },
@@ -67,11 +66,11 @@ export default class MeResolver {
 
   @Authorized()
   @Mutation(() => [File])
-  async updateImage (
+  async updateImage(
     @Arg('input', () => UpdateImageInput) input: UpdateImageInput,
-      @Ctx() context: Context
+    @Ctx() context: Context
   ): Promise<File> {
-    const profile = await context.prisma.profile.findFirst({
+    const profile = await context.prisma.user.findFirst({
       where: {
         id: context.currentUserId as string
       }
@@ -81,7 +80,7 @@ export default class MeResolver {
         await deleteFileById(profile.photo)
       }
       const file = await saveFile(input.file)
-      await context.prisma.profile.update({
+      await context.prisma.user.update({
         where: {
           id: profile.id
         },
@@ -91,12 +90,12 @@ export default class MeResolver {
       })
       return file
     }
-    throw new ApolloError('Profile not found')
+    throw new Error('Profile not found')
   }
 
   @Authorized()
   @Query(() => User, { nullable: true })
-  async me (@Ctx() context: Context): Promise<User | null> {
+  async me(@Ctx() context: Context): Promise<User | null> {
     return await context.prisma.user.findFirst({
       where: {
         id: context.currentUserId as string

@@ -1,10 +1,11 @@
-import { PrismaClient, type Prisma } from '@prisma/client'
 import { faker } from '@faker-js/faker'
+import { PrismaClient, type Prisma } from '@prisma/client'
+
 import categoriesJson from './categories.json'
 
 const prisma = new PrismaClient()
 
-function createRandomUser (): Prisma.UserCreateInput {
+function createRandomUser(): Prisma.UserCreateInput {
   return {
     phone: faker.phone.number('027#######'),
     role: 'USER'
@@ -17,7 +18,7 @@ interface CategoryJson {
   children?: CategoryJson[]
 }
 
-async function createNestedCategories (arr: CategoryJson[], parent?: string): Promise<void> {
+async function createNestedCategories(arr: CategoryJson[], parent?: string): Promise<void> {
   for (const item of arr) {
     const dbItem = await prisma.category.create({
       data: {
@@ -32,7 +33,7 @@ async function createNestedCategories (arr: CategoryJson[], parent?: string): Pr
   }
 }
 
-async function main (): Promise<void> {
+async function main(): Promise<void> {
   // const existingUsersCount = await prisma.user.count()
   // if (existingUsersCount !== 0) {
   //   throw new Error('Your database is not empty, run "npm run reset" first')
@@ -62,7 +63,7 @@ main()
   .then(async () => {
     await prisma.$disconnect()
   })
-  .catch(async (e) => {
+  .catch(async e => {
     console.error(e)
     await prisma.$disconnect()
     process.exit(1)

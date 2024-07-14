@@ -6,11 +6,11 @@ import { Icon, useTheme } from '@rneui/themed'
 
 import AuthScreen from 'src/screens/auth'
 import GalleryPreviewScreen from 'src/screens/gallery/preview'
-import NewTaskScreen from 'src/screens/new-task'
 
 import LinkingConfiguration from './LinkingConfiguration'
 import MainNavigator from './MainNavigator'
 import NavigationRef from './NavigationRef'
+import NewTaskNavigator from './NewTaskNavigator'
 import { RootStackParamList } from './types'
 
 export default function Navigation(): JSX.Element {
@@ -57,19 +57,11 @@ function RootNavigator(): JSX.Element {
       />
       <Stack.Screen
         name='NewTask'
-        component={NewTaskScreen}
-        options={({ navigation }) => ({
-          headerShown: true,
-          headerStyle: {
-            backgroundColor: theme.colors.background
-          },
-          headerTintColor: theme.colors.black,
-          headerLeft: () => <Button title='Cancel' onPress={navigation.goBack} />,
-          headerRight: () => <Button title='Submit' onPress={navigation.goBack} />,
-          headerTitle: 'New Task',
-          headerLargeTitle: true,
-          presentation: 'formSheet'
-        })}
+        component={NewTaskNavigator}
+        options={{
+          presentation: 'formSheet',
+          headerShown: false
+        }}
       />
     </Stack.Navigator>
   )
