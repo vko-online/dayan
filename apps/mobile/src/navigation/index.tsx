@@ -1,12 +1,14 @@
 import React from 'react'
-import { Button, Pressable } from 'react-native'
+import { Pressable } from 'react-native'
+import { useSelector } from 'react-redux'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { Icon, useTheme } from '@rneui/themed'
+import { Icon } from '@rneui/themed'
 
-import AuthScreen from 'src/screens/auth'
 import GalleryPreviewScreen from 'src/screens/gallery/preview'
+import { RootState } from 'src/store'
 
+import AuthNavigator from './AuthNavigator'
 import LinkingConfiguration from './LinkingConfiguration'
 import MainNavigator from './MainNavigator'
 import NavigationRef from './NavigationRef'
@@ -30,11 +32,16 @@ export default function Navigation(): JSX.Element {
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 function RootNavigator(): JSX.Element {
-  const { theme } = useTheme()
+  const auth = useSelector((state: RootState) => state.auth)
+  let initialRoute: keyof RootStackParamList = 'Main'
+
+  if (auth.token == null) {
+    initialRoute = 'Auth'
+  }
   return (
-    <Stack.Navigator initialRouteName='Main'>
+    <Stack.Navigator initialRouteName={initialRoute}>
       <Stack.Screen name='Main' component={MainNavigator} options={{ headerShown: false }} />
-      <Stack.Screen name='Auth' component={AuthScreen} options={{ headerShown: false }} />
+      <Stack.Screen name='Auth' component={AuthNavigator} options={{ headerShown: false }} />
       <Stack.Screen
         name='GalleryPreview'
         component={GalleryPreviewScreen}

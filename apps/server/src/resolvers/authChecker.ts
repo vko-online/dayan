@@ -1,4 +1,4 @@
-import { type Context } from 'src/context'
+import { type Context } from 'src/context.ts'
 import { type AuthChecker } from 'type-graphql'
 
 const authChecker: AuthChecker<Context> = async ({ context: { currentUserId, prisma } }, roles) => {

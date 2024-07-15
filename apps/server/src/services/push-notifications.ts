@@ -1,7 +1,8 @@
 // import { prisma } from 'src/context'
-import { type User } from 'src/generated/type-graphql'
 
-import { sendPushNotification } from './expo-push'
+import { User } from 'src/models/index.ts'
+
+import { sendPushNotification } from './expo-push.ts'
 
 export async function newBunRegisteredNearYou(pushId: string, usr: User): Promise<void> {
   throw new Error('not implemented')

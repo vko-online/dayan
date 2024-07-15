@@ -1,7 +1,7 @@
 import Upload, { FileUpload } from 'graphql-upload/Upload.mjs'
-import { Context } from 'src/context'
-import { File, User } from 'src/generated/type-graphql'
-import { deleteFileById, saveFile } from 'src/services/fileUpload'
+import { Context } from 'src/context.ts'
+import { File, User } from 'src/models/index.ts'
+import { deleteFileById, saveFile } from 'src/services/fileUpload.ts'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 
 @InputType()

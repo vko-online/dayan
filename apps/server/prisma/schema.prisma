@@ -9,10 +9,10 @@ datasource db {
   extensions = [postgis]
 }
 
-generator typegraphql {
-  provider = "typegraphql-prisma"
-  output   = "../src/generated/type-graphql"
-}
+// generator typegraphql {
+//   provider = "typegraphql-prisma"
+//   output   = "../src/generated/type-graphql"
+// }
 
 enum Role {
   ADMIN
@@ -45,20 +45,19 @@ model User {
 
   name         String?
   photo        String?
-  followingIds String[] // ProfileCategory
+  categoryIds String[] // ProfileCategory
 
   messages      Message[]      @relation(name: "UserMessages")
   conversations Conversation[] @relation(name: "UserConversations")
-  notifications Notification[] @relation(name: "UserNotifications")
 }
 
 model Review {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   text      String
-  serviceId String
+  taskId String
   // target user id to give review for, not profile
-  userId    String
+  targetUserId    String
   stars     Int
   authorId  String
   images    String[]
@@ -76,7 +75,8 @@ model Activity {
   text      String
   type      ActivityType
   authorId  String
-  userId    String?
+  modelType String?
+  modelId   String?
 }
 
 model Otp {
@@ -85,26 +85,6 @@ model Otp {
   pin       String
   createdAt DateTime @default(now())
   expiredAt DateTime
-}
-
-enum NotificationType {
-  NEW_EVENT
-  NEW_ACTIVITY
-  NEW_MESSAGE
-  SYSTEM
-  PROMO
-}
-
-model Notification {
-  id        String           @id @default(cuid())
-  createdAt DateTime         @default(now())
-  title     String?
-  content   String?
-  url       String?
-  imageUrl  String?
-  type      NotificationType
-  userId    String
-  user      User             @relation(name: "UserNotifications", references: [id], fields: [userId])
 }
 
 model Conversation {

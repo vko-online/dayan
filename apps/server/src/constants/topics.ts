@@ -1,3 +1,7 @@
-export const NEW_MESSAGE = 'NEW_MESSAGE'
-export const PROMO = 'PROMO'
-export const WEEKLY_DIGEST = 'WEEKLY_DIGEST'
+export enum NotificationType {
+  NEW_EVENT = 'NEW_EVENT',
+  NEW_ACTIVITY = 'NEW_ACTIVITY',
+  NEW_MESSAGE = 'NEW_MESSAGE',
+  SYSTEM = 'SYSTEM',
+  PROMO = 'PROMO'
+}

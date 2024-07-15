@@ -1,7 +1,14 @@
 import { RedisPubSub } from 'graphql-redis-subscriptions'
-import Redis from 'ioredis'
+import { createPubSub } from 'graphql-yoga'
+import { Redis } from 'ioredis'
+import { NotificationType } from 'src/constants/topics.ts'
+import { MessageWithTargetIds } from 'src/resolvers/ConversationResolver.ts'
 
 let _redis: RedisPubSub
+
+export const yogaPubSub = createPubSub<{
+  [NotificationType.NEW_MESSAGE]: [MessageWithTargetIds]
+}>()
 
 const redisOptions = {
   password: process.env.REDIS_PASSWORD,

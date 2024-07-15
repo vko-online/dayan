@@ -1,8 +1,8 @@
 import { addDays } from 'date-fns'
 import { GraphQLError } from 'graphql'
 import jwt from 'jsonwebtoken'
-import { Context } from 'src/context'
-import { User } from 'src/generated/type-graphql'
+import { Context } from 'src/context.ts'
+import { User } from 'src/models/User.ts'
 import { Resolver, Mutation, InputType, ObjectType, Field, Arg, Ctx } from 'type-graphql'
 // import { VoidMock } from 'graphql-scalars'
 

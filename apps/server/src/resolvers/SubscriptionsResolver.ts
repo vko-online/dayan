@@ -1,7 +1,7 @@
-import { NEW_MESSAGE } from 'src/constants/topics'
+import { NotificationType } from 'src/constants/topics.ts'
 import { Args, Field, ArgsType, Resolver, Root, Subscription, Authorized } from 'type-graphql'
 
-import { MessageWithTargetIds } from './ConversationResolver'
+import { MessageWithTargetIds } from './ConversationResolver.ts'
 
 @ArgsType()
 class GenericListenerArgs {
@@ -13,7 +13,7 @@ class GenericListenerArgs {
 export default class SubscriptionsResolver {
   @Authorized()
   @Subscription(() => MessageWithTargetIds, {
-    topics: NEW_MESSAGE,
+    topics: NotificationType.NEW_MESSAGE,
     filter: ({ payload, args }) => {
       return payload.targetId === args.currentUserId
     }

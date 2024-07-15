@@ -1,3 +1,0 @@
-mutation updateUserPresence ($input: PresenceInput!) {
-  updatePresence (input: $input)
-}

@@ -12,7 +12,7 @@ import {
   type ExpoPushTicket
 } from 'expo-server-sdk'
 
-import { removePushId } from './prisma'
+import { removePushId } from './prisma.ts'
 // Create a new Expo SDK client
 // optionally providing an access token if you have enabled push security
 const expo = new Expo({ accessToken: process.env.EXPO_ACCESS_TOKEN })

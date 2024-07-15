@@ -1,10 +1,12 @@
-import { TaskLocation } from '@prisma/client'
+import { TaskPayment, TaskPaymentType } from '@prisma/client/wasm'
 import Upload, { FileUpload } from 'graphql-upload/Upload.mjs'
-import { Context } from 'src/context'
-import { type File, Task, TaskPayment, TaskPaymentType } from 'src/generated/type-graphql'
-import { saveFile } from 'src/services/fileUpload'
-import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver, FieldResolver, Root } from 'type-graphql'
+import { Context } from 'src/context.ts'
+import { File, Task } from 'src/models/index.ts'
+import { saveFile } from 'src/services/fileUpload.ts'
+import { NullOrUndefined } from 'src/utils/type.ts'
+import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 
+@InputType()
 class LocationWithAltitudeInput {
   @Field()
   altitude!: number
@@ -16,43 +18,43 @@ class LocationWithAltitudeInput {
   longitude!: number
 }
 
-class LocationInput {
-  @Field()
-  latitude!: number
+// class LocationInput {
+//   @Field()
+//   latitude!: number
 
-  @Field()
-  longitude!: number
-}
+//   @Field()
+//   longitude!: number
+// }
 
 @InputType()
 class TaskInput {
   @Field()
   description!: string
 
-  @Field({ nullable: true })
-  price?: number
+  @Field(type => Number, { nullable: true })
+  price?: NullOrUndefined<number>
 
-  @Field({ nullable: true })
-  paymentType?: TaskPaymentType
+  @Field(type => TaskPaymentType, { nullable: true })
+  paymentType?: NullOrUndefined<TaskPaymentType>
 
   // cash only for now
-  // @Field({ nullable: true })
+  // @Field(type => String, { nullable: true })
   //   payment?: Payment
 
-  @Field({ nullable: true })
-  date?: Date
+  @Field(type => Date, { nullable: true })
+  date?: NullOrUndefined<Date>
 
-  @Field({ nullable: true })
-  address?: string
+  @Field(type => String, { nullable: true })
+  address?: NullOrUndefined<string>
 
-  @Field({ nullable: true })
-  location?: LocationWithAltitudeInput
+  @Field(type => LocationWithAltitudeInput, { nullable: true })
+  location?: NullOrUndefined<LocationWithAltitudeInput>
 
-  @Field({ nullable: true })
-  categoryId?: string
+  @Field(type => String, { nullable: true })
+  categoryId?: NullOrUndefined<string>
 
   @Field(() => [Upload], { nullable: true })
-  images?: FileUpload[]
+  images?: NullOrUndefined<FileUpload[]>
 }
 
 @Resolver()
@@ -60,7 +62,7 @@ export default class MatchmakingResolver {
   @Authorized()
   @Mutation(() => Task)
   async createTask(
-    @Arg('data', () => TaskInput, { nullable: false }) data: TaskInput,
+    @Arg('data', () => TaskInput) data: TaskInput,
     @Ctx() context: Context
   ): Promise<Task> {
     const files: File[] = []
@@ -92,7 +94,7 @@ export default class MatchmakingResolver {
       altitude: data.location?.altitude ?? 0,
       location: {
         latitude: data.location?.latitude ?? 0,
-        longitude: data.location?.longitude ?? 0,
+        longitude: data.location?.longitude ?? 0
       }
     })
 
@@ -111,16 +113,22 @@ export default class MatchmakingResolver {
     })
   }
 
-  @Authorized()
-  @Query(() => [Task])
-  async findClosestTasks(@Ctx() context: Context, @Arg('location', () => LocationInput) location: LocationInput): Promise<Task[]> {
-    const taskLocations = await context.prisma.taskLocation.findClosestPoints(location.latitude, location.longitude)
-    return await context.prisma.task.findMany({
-      where: {
-        id: {
-          in: taskLocations.map(v => v.taskId)
-        }
-      }
-    })
-  }
+  // @Authorized()
+  // @Query(() => [Task])
+  // async findClosestTasks(
+  //   @Ctx() context: Context,
+  //   @Arg('location', () => LocationInput) location: LocationInput
+  // ): Promise<Task[]> {
+  //   const taskLocations = await context.prisma.taskLocation.findClosestPoints(
+  //     location.latitude,
+  //     location.longitude
+  //   )
+  //   return await context.prisma.task.findMany({
+  //     where: {
+  //       id: {
+  //         in: taskLocations.map((v: TaskLocation) => v.taskId)
+  //       }
+  //     }
+  //   })
+  // }
 }

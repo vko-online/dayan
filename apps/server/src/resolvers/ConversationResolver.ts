@@ -1,8 +1,8 @@
 import Filter from 'bad-words'
-import { NEW_MESSAGE } from 'src/constants/topics'
-import { Context } from 'src/context'
-import { Conversation, Message } from 'src/generated/type-graphql'
-import { sendOrPublish } from 'src/services/broker'
+import { NotificationType } from 'src/constants/topics.ts'
+import { Context } from 'src/context.ts'
+import { Conversation, Message } from 'src/models/index.ts'
+import { sendOrPublish } from 'src/services/broker.ts'
 import {
   Arg,
   Authorized,
@@ -34,11 +34,8 @@ export class MessageWithTargetIds {
   @Field()
   conversationId!: string
 
-  @Field()
+  @Field(type => Message)
   message!: Message
-
-  @Field()
-  type!: string
 }
 
 @ObjectType()
@@ -51,7 +48,7 @@ export class BatchPayload {
 export default class ConversationResolver {
   @Authorized()
   @Query(() => [Conversation])
-  async myConversations(@Ctx() context: Context): Promise<Conversation[]> {
+  async conversations(@Ctx() context: Context): Promise<Conversation[]> {
     return await context.prisma.conversation.findMany({
       where: {
         members: {
@@ -66,7 +63,6 @@ export default class ConversationResolver {
     })
   }
 
-  // this can be called from client, should remove it here
   @Authorized()
   @Mutation(() => BatchPayload)
   async markAsRead(
@@ -92,7 +88,6 @@ export default class ConversationResolver {
     })
   }
 
-  // this can be called from client, should remove it here
   @Authorized()
   @Mutation(() => BatchPayload)
   async markAsReceived(
@@ -176,8 +171,8 @@ export default class ConversationResolver {
     // todo: redundant check here
     if (convo != null) {
       const [targetId] = convo.members
-        .map(v => v.id)
-        .filter(v => v !== (context.currentUserId as string))
+        .map((v: any) => v.id)
+        .filter((v: any) => v !== (context.currentUserId as string))
 
       const messageWithTargetIds: MessageWithTargetIds = {
         targetId,
@@ -185,11 +180,10 @@ export default class ConversationResolver {
         message: {
           ...msg,
           createdAt: new Date(msg.createdAt) // todo: temp hack for now while scalars not added
-        },
-        type: NEW_MESSAGE
+        }
       }
       await sendOrPublish({
-        topic: NEW_MESSAGE,
+        topic: NotificationType.NEW_MESSAGE,
         data: messageWithTargetIds,
         to: [targetId],
         message: {

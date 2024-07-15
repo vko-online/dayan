@@ -1,8 +1,8 @@
 import { type RedisPubSub } from 'graphql-redis-subscriptions'
 import { type Context as WsContext } from 'graphql-ws'
 import jwt from 'jsonwebtoken'
-import { ExtendedPrismaClient, prisma } from 'src/services/prisma'
-import { redis } from 'src/services/redis'
+import { ExtendedPrismaClient, prisma } from 'src/services/prisma.ts'
+import { redis } from 'src/services/redis.ts'
 import { AuthorizationError } from 'type-graphql'
 
 export interface Context {

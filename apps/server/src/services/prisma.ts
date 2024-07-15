@@ -1,4 +1,12 @@
-import { PrismaClient, Task, TaskLocation } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
+import { TaskLocation } from '@prisma/client/wasm'
+
+type TaskLocationWithExtra = TaskLocation & {
+  location: {
+    latitude: number
+    longitude: number
+  }
+}
 
 const prismaExtended = new PrismaClient().$extends({
   model: {
@@ -40,7 +48,7 @@ const prismaExtended = new PrismaClient().$extends({
             ORDER BY ST_DistanceSphere(location::geometry, ST_MakePoint(${longitude}, ${latitude})) DESC`
 
         // Transform to our custom type
-        const taskLocations: TaskLocation[] = result.map(data => {
+        const taskLocations: TaskLocationWithExtra[] = result.map((data: any) => {
           return {
             id: data.id ?? '',
             taskId: data.taskId ?? '',
@@ -54,6 +62,34 @@ const prismaExtended = new PrismaClient().$extends({
 
         // Return data
         return taskLocations
+      },
+      async findTaskLocationByTaskId(id: string) {
+        // Query for clostest points of interests
+        const result = await prisma.$queryRaw<
+          {
+            id: string | null
+            taskId: string | null
+            altitude: number | null
+            st_x: number | null
+            st_y: number | null
+          }[]
+        >`SELECT id, taskId, altitude, ST_X(location::geometry), ST_Y(location::geometry) 
+            FROM "TaskLocation" 
+            WHERE taskId = ${id}`
+
+        if (result.length > 0) {
+          const data = result[0]
+          return {
+            id: data.id ?? '',
+            taskId: data.taskId ?? '',
+            altitude: data.altitude ?? 0,
+            location: {
+              latitude: data.st_x ?? 0,
+              longitude: data.st_y ?? 0
+            }
+          }
+        }
+        return null
       }
     }
   }

@@ -1,4 +1,4 @@
-import { Context } from 'src/context'
+import { Context } from 'src/context.ts'
 import { Resolver, InputType, Field, Arg, Ctx, Authorized, Mutation } from 'type-graphql'
 // import { VoidMock } from 'graphql-scalars'
 

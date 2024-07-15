@@ -8,10 +8,21 @@ declare global {
 }
 export type RootStackParamList = {
   Main: NavigatorScreenParams<MainStackParamList>
-  Auth: undefined
+  Auth: NavigatorScreenParams<AuthStackParamList>
   GalleryPreview: undefined
   NewTask: NavigatorScreenParams<NewTaskStackParamList>
 }
+
+export type AuthStackParamList = {
+  Index: undefined
+  OneTimePin: {
+    phone: string
+  }
+}
+export type AuthStackScreenProps<Screen extends keyof AuthStackParamList> = NativeStackScreenProps<
+  AuthStackParamList,
+  Screen
+>
 
 export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<
   RootStackParamList,

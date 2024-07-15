@@ -1,7 +1,7 @@
-import { type User } from 'src/generated/type-graphql'
-import { prisma } from 'src/services/prisma'
+import { User } from 'src/models/index.ts'
+import { prisma } from 'src/services/prisma.ts'
 
-import { currentlyOnline } from './push-notifications'
+import { currentlyOnline } from './push-notifications.ts'
 
 export async function currentlyOnlineRunner(): Promise<void> {
   // const usersIds = await findAllOnline()
@@ -18,7 +18,7 @@ export async function currentlyOnlineRunner(): Promise<void> {
   })
   if (users.length > 0) {
     await currentlyOnline(
-      users.map(item => ({ count: users.length - 1, pushId: item.pushId as string }))
+      users.map((item: User) => ({ count: users.length - 1, pushId: item.pushId as string }))
     )
   }
 }

@@ -1,7 +1,8 @@
 import React, { memo } from 'react'
 import { Dimensions, Pressable, StyleSheet, View } from 'react-native'
 import { BottomSheetHandleProps } from '@gorhom/bottom-sheet'
-import { Chip, Icon, Text, useTheme } from '@rneui/themed'
+import { Icon } from '@rneui/base'
+import { Chip, Text, useTheme } from '@rneui/themed'
 
 import Box from 'src/components/Box'
 

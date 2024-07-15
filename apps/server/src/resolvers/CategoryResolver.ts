@@ -1,5 +1,5 @@
-import { Context } from 'src/context'
-import { Category } from 'src/generated/type-graphql'
+import { Context } from 'src/context.ts'
+import { Category } from 'src/models/Category.ts'
 import { Resolver, InputType, Field, Arg, Ctx, Query } from 'type-graphql'
 
 @InputType()
@@ -10,7 +10,7 @@ class CategoryQueryInput {
 
 @Resolver()
 export default class CategoryResolver {
-  @Query(() => [Category], { nullable: false }) // prisma resolver
+  @Query(() => [Category], { nullable: false })
   async searchCategory(
     @Arg('input', type => CategoryQueryInput, { nullable: false }) input: CategoryQueryInput,
     @Ctx() context: Context

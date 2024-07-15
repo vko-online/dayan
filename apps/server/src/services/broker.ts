@@ -1,14 +1,15 @@
 // send push or pubsub
 
 import { type ExpoPushMessage } from 'expo-server-sdk'
+import { NotificationType } from 'src/constants/topics.ts'
 
-import { sendPushNotification } from './expo-push'
-import { prisma } from './prisma'
-import { redis } from './redis'
+import { sendPushNotification } from './expo-push.ts'
+import { prisma } from './prisma.ts'
+import { redis } from './redis.ts'
 
 interface Input<T> {
   to: string | string[]
-  topic: string
+  topic: NotificationType
   data: T
   message: Pick<ExpoPushMessage, 'badge' | 'body' | 'title' | 'subtitle'>
 }
@@ -27,7 +28,7 @@ export async function sendOrPublish<T>(input: Input<T>): Promise<void> {
       }
     }
   })
-  const msgs = users.map(user => ({
+  const msgs = users.map((user: any) => ({
     to: user.pushId as string,
     badge: input.message.badge,
     body: input.message.body,

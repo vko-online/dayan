@@ -1,6 +1,6 @@
-import { PROMO } from 'src/constants/topics'
-import { Context } from 'src/context'
-import { sendOrPublish } from 'src/services/broker'
+import { NotificationType } from 'src/constants/topics.ts'
+import { Context } from 'src/context.ts'
+import { sendOrPublish } from 'src/services/broker.ts'
 import { Resolver, InputType, Field, Arg, Ctx, Mutation, Authorized } from 'type-graphql'
 
 @InputType()
@@ -28,7 +28,7 @@ export default class NotificationResolver {
       data: {
         content: input.content,
         title: input.title,
-        type: PROMO
+        type: NotificationType.PROMO
         // url: 'notifications/'
       },
       message: {
@@ -37,18 +37,18 @@ export default class NotificationResolver {
         subtitle: input.title
       },
       to: input.userIds,
-      topic: PROMO
+      topic: NotificationType.PROMO
     })
-    const result = await context.prisma.notification.createMany({
-      data: input.userIds?.map(userId => ({
-        title: input.title,
-        content: input.content,
-        type: PROMO,
-        userId
-      })),
-      skipDuplicates: true
-    })
+    // const result = await context.prisma.notification.createMany({
+    //   data: input.userIds?.map(userId => ({
+    //     title: input.title,
+    //     content: input.content,
+    //     type: PROMO,
+    //     userId
+    //   })),
+    //   skipDuplicates: true
+    // })
 
-    return result.count
+    return input.userIds.length
   }
 }

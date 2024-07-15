@@ -1,6 +1,5 @@
 import 'reflect-metadata'
 import 'dotenv/config'
-import 'src/enhancers/resolverEnhancers'
 import { ApolloServer } from '@apollo/server'
 import { expressMiddleware } from '@apollo/server/express4'
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
@@ -11,56 +10,63 @@ import {
 import cors from 'cors'
 import express from 'express'
 import { DateTimeResolver } from 'graphql-scalars'
+import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
+import Upload from 'graphql-upload/Upload.mjs'
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
+// import { graphqlUploadExpress, GraphQLUpload, Upload } from 'graphql-upload'
 import { useServer } from 'graphql-ws/lib/use/ws'
 import { createServer } from 'http'
 import { makeDirectory } from 'make-dir'
 import * as path from 'path'
-import { startJobs } from 'src/services/jobs'
+import { yogaPubSub } from 'src/services/redis.ts'
 import { buildSchema } from 'type-graphql'
+import { fileURLToPath } from 'url'
 import { WebSocketServer } from 'ws'
 
-import { getAppUrl, getAppWsUrl } from './constants/env'
-import { UPLOADS_PATH } from './constants/uploads'
-import { createContext, createWsContext } from './context'
+import { getAppUrl, getAppWsUrl } from './constants/env.ts'
+import { UPLOADS_PATH } from './constants/uploads.ts'
+import { createContext, createWsContext } from './context.ts'
 import {
-  UserCrudResolver,
-  UserRelationsResolver,
-  FileCrudResolver,
-  MessageCrudResolver,
-  MessageRelationsResolver,
-  ActivityCrudResolver,
-  TaskCrudResolver,
-  ConversationCrudResolver,
-  ConversationRelationsResolver,
-  NotificationCrudResolver,
-  NotificationRelationsResolver,
-  VerificationCrudResolver,
-  VerificationRelationsResolver,
-  ReviewCrudResolver,
-  CategoryCrudResolver
-} from './generated/type-graphql'
-import AuthResolver from './resolvers/AuthResolver'
-import CategoryResolver from './resolvers/CategoryResolver'
-import ConversationResolver from './resolvers/ConversationResolver'
-import MatchmakingResolver from './resolvers/MatchmakingResolver'
-import MeResolver from './resolvers/MeResolver'
-import NotificationResolver from './resolvers/NotificationResolver'
-import OnboardingResolver from './resolvers/OnboardingResolver'
-import StateResolver from './resolvers/StateResolver'
-import SubscriptionsResolver from './resolvers/SubscriptionsResolver'
-import TaskResolver from './resolvers/TaskResolver'
-import authChecker from './resolvers/authChecker'
-import Upload from 'graphql-upload/Upload.mjs'
-import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
+  Activity,
+  Category,
+  Conversation,
+  ConversationRelationResolver,
+  File,
+  GeoLocation,
+  Message,
+  MessageRelationResolver,
+  Otp,
+  Review,
+  ReviewRelationResolver,
+  Task,
+  TaskLocation,
+  TaskRelationResolver,
+  User,
+  UserCategory,
+  UserPartial,
+  UserRelationResolver,
+  Verification
+} from './models/index.ts'
+import AuthResolver from './resolvers/AuthResolver.ts'
+import CategoryResolver from './resolvers/CategoryResolver.ts'
+import ConversationResolver from './resolvers/ConversationResolver.ts'
+import MatchmakingResolver from './resolvers/MatchmakingResolver.ts'
+import MeResolver from './resolvers/MeResolver.ts'
+import NotificationResolver from './resolvers/NotificationResolver.ts'
+import OnboardingResolver from './resolvers/OnboardingResolver.ts'
+import StateResolver from './resolvers/StateResolver.ts'
+import SubscriptionsResolver from './resolvers/SubscriptionsResolver.ts'
+import authChecker from './resolvers/authChecker.ts'
+import { startJobs } from './services/jobs.ts'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 async function main(): Promise<void> {
   await makeDirectory(UPLOADS_PATH)
 
   const schema = await buildSchema({
     scalarsMap: [
       {
-        scalar: GraphQLUpload,
+        scalar: GraphQLUpload as any,
         type: Upload
       },
       {
@@ -69,15 +75,25 @@ async function main(): Promise<void> {
       }
     ],
     resolvers: [
-      UserCrudResolver,
-      UserRelationsResolver,
-      FileCrudResolver,
-      MessageCrudResolver,
-      MessageRelationsResolver,
-      ActivityCrudResolver,
-      TaskCrudResolver,
-      ConversationCrudResolver,
-      ConversationRelationsResolver,
+      Activity,
+      Category,
+      Conversation,
+      ConversationRelationResolver,
+      File,
+      GeoLocation,
+      Message,
+      MessageRelationResolver,
+      Otp,
+      Review,
+      ReviewRelationResolver,
+      Task,
+      TaskLocation,
+      TaskRelationResolver,
+      User,
+      UserCategory,
+      UserPartial,
+      UserRelationResolver,
+      Verification,
       AuthResolver,
       OnboardingResolver,
       StateResolver,
@@ -85,22 +101,15 @@ async function main(): Promise<void> {
       MeResolver,
       MatchmakingResolver,
       ConversationResolver,
-      NotificationCrudResolver,
-      NotificationRelationsResolver,
-      VerificationCrudResolver,
-      VerificationRelationsResolver,
       CategoryResolver,
-      NotificationResolver,
-      ReviewCrudResolver,
-      CategoryCrudResolver,
-      TaskResolver
+      NotificationResolver
     ],
     emitSchemaFile: path.resolve(__dirname, './generated/schema.graphql'),
     validate: false,
     authMode: 'error',
-    authChecker
+    authChecker,
     // dateScalarMode: 'isoDate'
-    // pubSub: redis
+    pubSub: yogaPubSub
   })
 
   const app = express()

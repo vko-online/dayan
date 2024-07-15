@@ -3,9 +3,9 @@ import { GraphQLError } from 'graphql'
 import { type FileUpload } from 'graphql-upload/Upload.mjs'
 import path from 'path'
 import shortId from 'shortid'
-import { UPLOADS_URL } from 'src/constants/uploads'
-import { type File } from 'src/generated/type-graphql'
-import { prisma } from 'src/services/prisma'
+import { UPLOADS_URL } from 'src/constants/uploads.ts'
+import type { File } from 'src/models/index.ts'
+import { prisma } from 'src/services/prisma.ts'
 
 export async function saveFile(file: FileUpload): Promise<File> {
   // eslint-disable-next-line @typescript-eslint/await-thenable
@@ -68,7 +68,7 @@ export async function deleteFileById(id: string): Promise<boolean> {
           id
         }
       })
-      .then(file => {
+      .then((file: any) => {
         if (file) {
           unlink(file.path, err => {
             if (err != null) {
