@@ -1,4 +1,5 @@
 fragment ProfileParts on User {
   id
   name
+  photo
 }

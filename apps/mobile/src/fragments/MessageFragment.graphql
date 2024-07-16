@@ -4,6 +4,7 @@ fragment MessageParts on Message {
   author {
     id
     name
+    photo
   }
   createdAt
   readByIds
