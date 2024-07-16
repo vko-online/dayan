@@ -6,7 +6,7 @@ create services for people to pick up and earn money, uber but for services, for
 - node/npm
 - some brain cells
 
-# Uses npm monorepo, start from
+### Uses npm monorepo, start from
 - npm install # installs server/mobile/web dependencies
 
 ### server
