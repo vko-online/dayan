@@ -9,11 +9,12 @@ const { width: SCREEN_WIDTH } = Dimensions.get('screen')
 export const PROFILE_HANDLE_HEIGHT = 69
 
 interface ProfileHandleProps extends BottomSheetHandleProps {
-  name: string
+  name: string | null | undefined
+  phone: string | null | undefined
   onClose: () => void
 }
 
-const ProfileHandleComponent = ({ name, onClose }: ProfileHandleProps) => {
+const ProfileHandleComponent = ({ name, phone, onClose }: ProfileHandleProps) => {
   const { theme } = useTheme()
   return (
     <Box paddingHorizontal={16} paddingVertical={5} marginBottom={8}>
@@ -24,7 +25,7 @@ const ProfileHandleComponent = ({ name, onClose }: ProfileHandleProps) => {
         </Avatar>
         <Box flex={1}>
           <Text h4>{name}</Text>
-          <Text>evolcoder@gmail.com</Text>
+          <Text>{phone}</Text>
         </Box>
         <Pressable onPress={onClose}>
           <Icon

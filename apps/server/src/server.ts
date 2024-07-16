@@ -50,12 +50,12 @@ import {
 import AuthResolver from './resolvers/AuthResolver.ts'
 import CategoryResolver from './resolvers/CategoryResolver.ts'
 import ConversationResolver from './resolvers/ConversationResolver.ts'
-import MatchmakingResolver from './resolvers/MatchmakingResolver.ts'
 import MeResolver from './resolvers/MeResolver.ts'
 import NotificationResolver from './resolvers/NotificationResolver.ts'
 import OnboardingResolver from './resolvers/OnboardingResolver.ts'
 import StateResolver from './resolvers/StateResolver.ts'
 import SubscriptionsResolver from './resolvers/SubscriptionsResolver.ts'
+import TaskResolver from './resolvers/TaskResolver.ts'
 import authChecker from './resolvers/authChecker.ts'
 import { startJobs } from './services/jobs.ts'
 
@@ -99,7 +99,7 @@ async function main(): Promise<void> {
       StateResolver,
       SubscriptionsResolver,
       MeResolver,
-      MatchmakingResolver,
+      TaskResolver,
       ConversationResolver,
       CategoryResolver,
       NotificationResolver

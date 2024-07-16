@@ -58,7 +58,7 @@ class TaskInput {
 }
 
 @Resolver()
-export default class MatchmakingResolver {
+export default class TaskResolver {
   @Authorized()
   @Mutation(() => Task)
   async createTask(
@@ -105,10 +105,21 @@ export default class MatchmakingResolver {
 
   @Authorized()
   @Query(() => [Task])
-  async availableTasks(@Ctx() context: Context): Promise<Task[]> {
+  async tasks(@Ctx() context: Context): Promise<Task[]> {
     return await context.prisma.task.findMany({
       where: {
         status: 'CREATED'
+      }
+    })
+  }
+
+  @Authorized()
+  @Query(() => [Task])
+  async myTasks(@Ctx() context: Context): Promise<Task[]> {
+    const currentUserId = context.currentUserId as string
+    return await context.prisma.task.findMany({
+      where: {
+        authorId: currentUserId
       }
     })
   }

@@ -42,4 +42,4 @@ yarn-error.*
 .vscode
 # @end expo-cli
 
-./src/generated/
+src/generated/
