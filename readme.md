@@ -2,7 +2,7 @@
 create services for people to pick up and earn money, uber but for services, for example: take out rubish, clean carpet, do lawn, deliver things from shop, clean my room, etc.
 
 ### Demo
-<video src='' width=180/>
+<video src='https://github.com/vko-online/dayan/raw/main/assets/demo.mov' width=180/>
 
 ### Prerequisites
 - docker
