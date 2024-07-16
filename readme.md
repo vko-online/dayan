@@ -6,8 +6,10 @@ create services for people to pick up and earn money, uber but for services, for
 - node/npm
 - some brain cells
 
+Uses npm monorepo, start from
+- npm install # installs server/mobile/web dependencies
+
 ### server
-- npm install
 - npm run up # runs docker containers
 - npm run generate # generates prisma schema
 - npm run push # pushes changes to database
@@ -16,6 +18,5 @@ create services for people to pick up and earn money, uber but for services, for
 
 
 ### mobile
-- npm install
 - npm run generate # pulls db schema and generates graphql models/hooks
 - npm run start # or npm run ios/android
