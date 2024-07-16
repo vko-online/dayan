@@ -23,8 +23,12 @@ Deleting @types/react-native resolves this issue
 
 
 - missing <Icon name> property
-for some unknown reason icon name is not in the type, fix is in changing
+for some known reason icon name is not in the type, fix is in changing
 apps/mobile/node_modules/@rneui/themed/dist/Icon/index.d.ts
+reason is that react-native-elements@v4 is in beta
+```
+PropsWithChildren<IconProps> => PropsWithChildren<IconProps & IconObject>
+```
 from 
 ```
 declare const _default: import("react").FunctionComponent<import("react").PropsWithChildren<IconProps>> | import("react").ForwardRefExoticComponent<import("react").RefAttributes<import("react").PropsWithChildren<IconProps>>>;
