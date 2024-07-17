@@ -10,7 +10,7 @@ https://github.com/user-attachments/assets/86bec8a1-dfb5-41bd-8de3-27e68e1dba8e
 ### Prerequisites
 - docker
 - node/npm
-- some brain cells
+- ios/android build tools
 
 ### Uses npm monorepo, start from
 - npm install # installs server/mobile/web dependencies
