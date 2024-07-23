@@ -1,9 +1,9 @@
 import React from 'react'
 import { Pressable } from 'react-native'
+import { Icon } from 'react-native-paper'
 import { useSelector } from 'react-redux'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { Icon } from '@rneui/themed'
 
 import GalleryPreviewScreen from 'src/screens/gallery/preview'
 import { RootState } from 'src/store'
@@ -55,8 +55,8 @@ function RootNavigator(): JSX.Element {
             backgroundColor: '#000'
           },
           headerRight: ({ canGoBack }) => (
-            <Pressable>
-              <Icon name='close' size={32} color='#fff' onPress={navigation.goBack} />
+            <Pressable onPress={navigation.goBack}>
+              <Icon source='close' size={32} color='#fff' />
             </Pressable>
           ),
           presentation: 'fullScreenModal'

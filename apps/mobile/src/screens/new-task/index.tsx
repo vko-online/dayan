@@ -1,28 +1,61 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Pressable, ScrollView } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
+import { Button, List, Text, TextInput, useTheme } from 'react-native-paper'
 import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native'
-import { Button, Icon, Input, useTheme } from '@rneui/themed'
 import { formatDate } from 'date-fns'
-import { Formik } from 'formik'
+import { useFormik } from 'formik'
 import * as yup from 'yup'
 
 import Box from 'src/components/Box'
-import Surface from 'src/components/Surface'
-import { Text } from 'src/components/Text'
+import { TaskInput, TaskPaymentType } from 'src/generated/graphql'
 import { NewTaskStackParamList } from 'src/navigation/types'
 
+import { CategoryItem } from './category-selection'
 import MapInput from './map-input'
 
-const validationSchema = yup.object().shape({
-  description: yup.string().required('Description is required'),
-  date: yup.date().required('Date is required')
+const validationSchema: yup.ObjectSchema<TaskInput> = yup.object().shape({
+  address: yup.string().optional(),
+  categoryId: yup.string().optional(),
+  location: yup
+    .object()
+    .shape({
+      latitude: yup.number().required('Latitude is required'),
+      longitude: yup.number().required('Longitude is required'),
+      altitude: yup.number().required('Altitude is required')
+    })
+    .optional(),
+  paymentType: yup.string<TaskPaymentType>().optional(),
+  images: yup.array().optional(),
+  price: yup.number().optional(),
+  description: yup.string().defined(),
+  date: yup.date().optional()
 })
 
 const NewTaskScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp<NewTaskStackParamList, 'Index'>>()
   const route = useRoute<RouteProp<NewTaskStackParamList, 'Index'>>()
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
+  const [category, setCategory] = useState<CategoryItem>()
+
+  const { values, handleChange, setFieldValue } = useFormik<TaskInput>({
+    initialValues: {
+      date: new Date(),
+      description: '',
+      categoryId: '',
+      price: 0,
+      images: [],
+      paymentType: TaskPaymentType.Fixed,
+      address: '',
+      location: {
+        altitude: 0,
+        latitude: 0,
+        longitude: 0
+      }
+    },
+    validationSchema,
+    onSubmit: console.log
+  })
 
   const showDatePicker = () => {
     setDatePickerVisibility(true)
@@ -32,109 +65,92 @@ const NewTaskScreen: React.FC = () => {
     setDatePickerVisibility(false)
   }
 
-  const handleConfirm = (date: Date) => {
-    console.warn('A date has been picked: ', date)
-    hideDatePicker()
-  }
+  // const handleConfirm = (date: Date) => {
+  //   console.warn('A date has been picked: ', date)
+  //   hideDatePicker()
+  // }
 
-  const { theme } = useTheme()
+  useEffect(() => {
+    console.log('category', route.params?.category)
+    if (route.params?.category) {
+      setFieldValue('categoryId', route.params.category.id)
+      setCategory(route.params.category)
+    }
+  }, [route.params?.category, setFieldValue])
+
+  const { colors } = useTheme()
   return (
     <ScrollView
-      style={{ backgroundColor: theme.colors.background }}
+      style={{ backgroundColor: colors.background }}
       contentInsetAdjustmentBehavior='always'>
-      <Formik
-        validationSchema={validationSchema}
-        initialValues={{
-          date: new Date(),
-          description: '',
-          price: '0',
-          address: '',
-          location: {
-            altitude: 0,
-            latitude: 0,
-            longitude: 0
+      <Box paddingHorizontal={10} paddingTop={20} paddingBottom={10}>
+        <MapInput
+          location={route.params?.location}
+          onPress={() =>
+            navigation.navigate('MapSelection', {
+              location: route.params?.location
+            })
           }
-        }}
-        onSubmit={console.log}>
-        {({ values, handleChange, setFieldValue }) => (
-          <Box paddingHorizontal={10} paddingTop={20} paddingBottom={10}>
-            <MapInput
-              location={route.params?.location}
-              onPress={() =>
-                navigation.navigate('MapSelection', {
-                  location: route.params?.location
-                })
-              }
+        />
+        {/* <Text variant='labelMedium'>Description</Text> */}
+        <TextInput
+          multiline
+          label='Description'
+          placeholder='Task name'
+          mode='outlined'
+          value={values.description}
+          onChangeText={handleChange('description')}
+        />
+        <Box marginTop={15}>
+          <Text variant='labelMedium'>Category</Text>
+          <Pressable onPress={() => navigation.navigate('CategorySelection')}>
+            <List.Item
+              title={category?.name ?? 'Select category'}
+              left={props => category?.image && <List.Icon {...props} icon={category?.image} />}
+              right={props => <List.Icon {...props} icon='chevron-right' />}
             />
-            <Text label>Description</Text>
-            <Surface marginBottom={10} padding={0}>
-              <Input
-                multiline
-                inputStyle={{ minHeight: 80 }}
-                clearButtonMode='while-editing'
-                placeholder='Task name'
-                value={values.description}
-                onChangeText={handleChange('description')}
-              />
-            </Surface>
-            <Box marginTop={15}>
-              <Text label>Category</Text>
-              <Pressable onPress={() => navigation.navigate('CategorySelection')}>
-                <Surface justifyContent='center' flexDirection='row'>
-                  <Box flex={1} gap={10} flexDirection='row' alignItems='center'>
-                    <Icon name='directions-car' />
-                    <Text body>Transport</Text>
-                  </Box>
-                  <Icon name='chevron-right' />
-                </Surface>
-              </Pressable>
-            </Box>
-            <Box marginTop={15}>
-              <Text label>When</Text>
-              <Surface padding={0}>
-                <Input
-                  leftIcon={{ name: 'calendar-today', color: theme.colors.black }}
-                  placeholder='Date'
-                  value={formatDate(values.date, 'dd/MM/yyyy')}
-                  onPress={showDatePicker}
-                />
-              </Surface>
-            </Box>
-            <Box marginTop={15}>
-              <Text label>Price</Text>
-              <Surface padding={0}>
-                <Input
-                  leftIcon={{ name: 'money', color: theme.colors.black }}
-                  placeholder='Price'
-                  clearButtonMode='while-editing'
-                  value={values.price}
-                  onChangeText={handleChange('price')}
-                />
-              </Surface>
-            </Box>
-            <Text caption>Average price for this task 300$</Text>
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode='date'
-              onConfirm={(date: Date) => {
-                setFieldValue('date', date)
-                hideDatePicker()
-              }}
-              onCancel={hideDatePicker}
-            />
-            <Box marginTop={15}>
-              <Surface padding={0}>
-                <Button icon={{ name: 'photo', color: theme.colors.black }} type='clear'>
-                  Add your photos
-                </Button>
-              </Surface>
-            </Box>
-            <Box flex={1} />
+          </Pressable>
+        </Box>
+        <Box marginTop={15}>
+          <TextInput
+            placeholder='Date'
+            mode='outlined'
+            label='Date'
+            value={formatDate(values.date, 'dd/MM/yyyy')}
+            onPress={showDatePicker}
+          />
+        </Box>
+        <Box marginTop={15}>
+          <TextInput
+            placeholder='Price'
+            mode='outlined'
+            label='Price'
+            clearButtonMode='while-editing'
+            value={String(values.price)}
+            onChangeText={text => setFieldValue('price', Number(text))}
+          />
+        </Box>
+        <Text variant='bodyMedium'>Average price for this task 300$</Text>
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode='date'
+          onConfirm={(date: Date) => {
+            setFieldValue('date', date)
+            hideDatePicker()
+          }}
+          onCancel={hideDatePicker}
+        />
+        <Box marginTop={15}>
+          <Button icon='file-image' mode='contained-tonal'>
+            Add your photos
+          </Button>
+        </Box>
+        <Box flex={1} />
 
-            <Button onPress={() => {}} title='Create task' />
-          </Box>
-        )}
-      </Formik>
+        <Button mode='contained' onPress={() => {}}>
+          Create task
+        </Button>
+      </Box>
     </ScrollView>
   )
 }

@@ -6,6 +6,7 @@ import {
   useBlurOnFulfill,
   useClearByFocusCell
 } from 'react-native-confirmation-code-field'
+import { Text } from 'react-native-paper'
 import { type ApolloError } from '@apollo/client'
 import { CommonActions } from '@react-navigation/native'
 import { useFormik } from 'formik'
@@ -13,7 +14,6 @@ import isEmpty from 'lodash/isEmpty'
 import * as yup from 'yup'
 
 import Box from 'src/components/Box'
-import { Text } from 'src/components/Text'
 import { useCheckOtpMutation } from 'src/generated/graphql'
 import { type AuthStackScreenProps } from 'src/navigation/types'
 import { useAppDispatch } from 'src/store'
@@ -79,8 +79,8 @@ export default function Auth({
   return (
     <KeyboardAvoidingView style={s.root} behavior='height'>
       <Box justifyContent='center' alignItems='center'>
-        <Text style={s.title}>Two-Factor Authentication</Text>
-        <Text style={s.text}>
+        <Text variant='displaySmall'>Two-Factor Authentication</Text>
+        <Text>
           A message with a verification code has been sent to your device. Please enter the code to
           continue
         </Text>

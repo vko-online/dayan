@@ -187,10 +187,11 @@ export type PushCampaignInput = {
 
 export type Query = {
   __typename?: 'Query';
-  availableTasks: Array<Task>;
   conversations: Array<Conversation>;
   me?: Maybe<User>;
+  myTasks: Array<Task>;
   searchCategory: Array<Category>;
+  tasks: Array<Task>;
 };
 
 
@@ -225,7 +226,7 @@ export type SubscriptionNewMessageArgs = {
 
 export type Task = {
   __typename?: 'Task';
-  addresss?: Maybe<Scalars['String']>;
+  address?: Maybe<Scalars['String']>;
   author: UserPartial;
   authorId: Scalars['String'];
   categoryId?: Maybe<Scalars['String']>;
@@ -260,7 +261,7 @@ export type TaskLocation = {
   altitude: Scalars['Float'];
   id: Scalars['String'];
   location: GeoLocation;
-  taskId: Scalars['String'];
+  task: Scalars['String'];
 };
 
 export enum TaskPayment {
@@ -326,9 +327,9 @@ export enum VerificationStatus {
   Verified = 'VERIFIED'
 }
 
-export type MessagePartsFragment = { __typename?: 'Message', id: string, content: string, createdAt: any, readByIds: Array<string>, receivedByIds: Array<string>, author: { __typename?: 'UserPartial', id: string, name?: string | null } };
+export type MessagePartsFragment = { __typename?: 'Message', id: string, content: string, createdAt: any, readByIds: Array<string>, receivedByIds: Array<string>, author: { __typename?: 'UserPartial', id: string, name?: string | null, photo?: string | null } };
 
-export type ProfilePartsFragment = { __typename?: 'User', id: string, name?: string | null };
+export type ProfilePartsFragment = { __typename?: 'User', id: string, name?: string | null, photo?: string | null };
 
 export type CheckOtpMutationVariables = Exact<{
   input: CheckCodeInput;
@@ -351,6 +352,11 @@ export type SearchCategoryQueryVariables = Exact<{
 
 export type SearchCategoryQuery = { __typename?: 'Query', searchCategory: Array<{ __typename?: 'Category', id: string, name: string, description?: string | null, image?: string | null }> };
 
+export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TasksQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', id: string, title: string, description: string, status?: TaskStatus | null, price?: number | null, paymentType?: TaskPaymentType | null, payment?: TaskPayment | null, date?: any | null, state?: TaskState | null, address?: string | null, images: Array<string>, categoryId?: string | null, location?: { __typename?: 'TaskLocation', altitude: number, location: { __typename?: 'GeoLocation', latitude: number, longitude: number } } | null }> };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -368,7 +374,7 @@ export type NewMessageSubscriptionVariables = Exact<{
 }>;
 
 
-export type NewMessageSubscription = { __typename?: 'Subscription', newMessage: { __typename?: 'MessageWithTargetIds', targetId: string, conversationId: string, message: { __typename?: 'Message', id: string, content: string, createdAt: any, readByIds: Array<string>, receivedByIds: Array<string>, author: { __typename?: 'UserPartial', id: string, name?: string | null } } } };
+export type NewMessageSubscription = { __typename?: 'Subscription', newMessage: { __typename?: 'MessageWithTargetIds', targetId: string, conversationId: string, message: { __typename?: 'Message', id: string, content: string, createdAt: any, readByIds: Array<string>, receivedByIds: Array<string>, author: { __typename?: 'UserPartial', id: string, name?: string | null, photo?: string | null } } } };
 
 export const MessagePartsFragmentDoc = gql`
     fragment MessageParts on Message {
@@ -377,6 +383,7 @@ export const MessagePartsFragmentDoc = gql`
   author {
     id
     name
+    photo
   }
   createdAt
   readByIds
@@ -387,6 +394,7 @@ export const ProfilePartsFragmentDoc = gql`
     fragment ProfileParts on User {
   id
   name
+  photo
 }
     `;
 export const CheckOtpDocument = gql`
@@ -498,6 +506,58 @@ export function useSearchCategoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type SearchCategoryQueryHookResult = ReturnType<typeof useSearchCategoryQuery>;
 export type SearchCategoryLazyQueryHookResult = ReturnType<typeof useSearchCategoryLazyQuery>;
 export type SearchCategoryQueryResult = Apollo.QueryResult<SearchCategoryQuery, SearchCategoryQueryVariables>;
+export const TasksDocument = gql`
+    query tasks {
+  tasks {
+    id
+    title
+    description
+    status
+    price
+    paymentType
+    payment
+    date
+    state
+    address
+    images
+    categoryId
+    location {
+      altitude
+      location {
+        latitude
+        longitude
+      }
+    }
+  }
+}
+    `;
+
+/**
+ * __useTasksQuery__
+ *
+ * To run a query within a React component, call `useTasksQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTasksQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTasksQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useTasksQuery(baseOptions?: Apollo.QueryHookOptions<TasksQuery, TasksQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TasksQuery, TasksQueryVariables>(TasksDocument, options);
+      }
+export function useTasksLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TasksQuery, TasksQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TasksQuery, TasksQueryVariables>(TasksDocument, options);
+        }
+export type TasksQueryHookResult = ReturnType<typeof useTasksQuery>;
+export type TasksLazyQueryHookResult = ReturnType<typeof useTasksLazyQuery>;
+export type TasksQueryResult = Apollo.QueryResult<TasksQuery, TasksQueryVariables>;
 export const MeDocument = gql`
     query me {
   me {

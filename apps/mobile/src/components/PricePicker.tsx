@@ -7,7 +7,6 @@ import Animated, {
   useSharedValue
 } from 'react-native-reanimated'
 import { canvas2Polar, clamp, polar2Canvas, ReText } from 'react-native-redash'
-import { Text } from '@rneui/themed'
 
 const CANVAS_SIZE = 100
 const CENTER = {

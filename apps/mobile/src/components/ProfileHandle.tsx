@@ -1,12 +1,10 @@
 import React, { memo } from 'react'
-import { Dimensions, Pressable, StyleSheet, View } from 'react-native'
+import { Avatar, Text } from 'react-native-paper'
 import { BottomSheetHandleProps } from '@gorhom/bottom-sheet'
-import { Avatar, Icon, Text, useTheme } from '@rneui/themed'
 
 import Box from 'src/components/Box'
 
-const { width: SCREEN_WIDTH } = Dimensions.get('screen')
-export const PROFILE_HANDLE_HEIGHT = 69
+import { GenericHandle } from './GenericHandle'
 
 interface ProfileHandleProps extends BottomSheetHandleProps {
   name: string | null | undefined
@@ -14,41 +12,18 @@ interface ProfileHandleProps extends BottomSheetHandleProps {
   onClose: () => void
 }
 
-const ProfileHandleComponent = ({ name, phone, onClose }: ProfileHandleProps) => {
-  const { theme } = useTheme()
+const ProfileHandleComponent = ({ name, phone, ...other }: ProfileHandleProps) => {
   return (
-    <Box paddingHorizontal={16} paddingVertical={5} marginBottom={8}>
-      <View style={[s.indicator, { backgroundColor: theme.colors.divider }]} />
-      <Box flexDirection='row' gap={theme.spacing.md} alignItems='flex-start'>
-        <Avatar size={48} rounded source={{ uri: 'https://picsum.photos/200' }} title='MT'>
-          <Avatar.Accessory backgroundColor={theme.colors.success} name='check' size={16} />
-        </Avatar>
-        <Box flex={1}>
-          <Text h4>{name}</Text>
-          <Text>{phone}</Text>
+    <GenericHandle {...other}>
+      <Box padding={10} flexDirection='row' gap={10} alignItems='center'>
+        <Avatar.Image size={48} source={{ uri: 'https://picsum.photos/200' }} />
+        <Box>
+          <Text variant='bodyLarge'>{name}</Text>
+          <Text variant='labelSmall'>{phone}</Text>
         </Box>
-        <Pressable onPress={onClose}>
-          <Icon
-            color={theme.colors.divider}
-            type='material-community'
-            name='close-circle'
-            size={32}
-          />
-        </Pressable>
       </Box>
-    </Box>
+    </GenericHandle>
   )
 }
-
-const s = StyleSheet.create({
-  indicator: {
-    marginVertical: 5,
-    alignSelf: 'center',
-    width: (8 * SCREEN_WIDTH) / 100,
-    height: 5,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
-  }
-})
 
 export const ProfileHandle = memo(ProfileHandleComponent)

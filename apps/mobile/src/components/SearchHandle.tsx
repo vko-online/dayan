@@ -1,21 +1,19 @@
 import React, { memo, useCallback, useState } from 'react'
 import {
   Button,
-  Dimensions,
   Keyboard,
   NativeSyntheticEvent,
   Pressable,
   StyleSheet,
-  TextInputChangeEventData,
-  View
+  TextInputChangeEventData
 } from 'react-native'
+import { Avatar } from 'react-native-paper'
 import { BottomSheetHandleProps, BottomSheetTextInput } from '@gorhom/bottom-sheet'
-import { Avatar, useTheme } from '@rneui/themed'
 
 import Box from 'src/components/Box'
 
-const { width: SCREEN_WIDTH } = Dimensions.get('screen')
-export const SEARCH_HANDLE_HEIGHT = 69
+import { GenericHandle } from './GenericHandle'
+import { useAppTheme } from './themes'
 
 interface SearchHandleProps extends BottomSheetHandleProps {
   initialValue?: string
@@ -34,9 +32,10 @@ const SearchHandleComponent = ({
   onFocus,
   focused,
   onBlur,
-  onCancel
+  onCancel,
+  ...other
 }: SearchHandleProps) => {
-  const { theme } = useTheme()
+  const { colors } = useAppTheme()
   const [value, setValue] = useState(initialValue)
   const handleInputChange = useCallback(
     ({ nativeEvent: { text } }: NativeSyntheticEvent<TextInputChangeEventData>) => {
@@ -59,18 +58,16 @@ const SearchHandleComponent = ({
   const showCancel = value?.length > 0 || focused
 
   return (
-    <Box paddingHorizontal={16} paddingVertical={5}>
-      <View style={[s.indicator, { backgroundColor: theme.colors.divider }]} />
-      <Box flexDirection='row' gap={10} alignItems='center'>
+    <GenericHandle {...other}>
+      <Box width='100%' flexDirection='row' gap={10} alignItems='center'>
         <BottomSheetTextInput
-          style={[s.input, { color: theme.colors.black }]}
+          style={[s.input, { color: colors.text }]}
           value={value}
           textContentType='location'
           clearButtonMode='never'
           onFocus={onFocus}
           onPress={onFocus}
           onBlur={onBlur}
-          placeholderTextColor={theme.colors.grey1}
           placeholder='Search for a place or address'
           onChange={handleInputChange}
         />
@@ -78,23 +75,15 @@ const SearchHandleComponent = ({
           <Button title='Cancel' onPress={handleCancel} />
         ) : (
           <Pressable onPress={onProfilePress}>
-            <Avatar size={40} rounded source={{ uri: 'https://picsum.photos/200' }} title='MT' />
+            <Avatar.Image size={40} source={{ uri: 'https://picsum.photos/200' }} />
           </Pressable>
         )}
       </Box>
-    </Box>
+    </GenericHandle>
   )
 }
 
 const s = StyleSheet.create({
-  indicator: {
-    marginTop: 5,
-    alignSelf: 'center',
-    width: (8 * SCREEN_WIDTH) / 100,
-    height: 5,
-    borderRadius: 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
-  },
   input: {
     flex: 1,
     marginTop: 10,

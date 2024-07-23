@@ -1,0 +1,23 @@
+query tasks {
+  tasks {
+    id
+    title
+    description
+    status
+    price
+    paymentType
+    payment
+    date
+    state
+    address
+    images
+    categoryId
+    location {
+      altitude
+      location {
+        latitude
+        longitude
+      }
+    }
+  }
+}

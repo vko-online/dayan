@@ -1,6 +1,6 @@
 import { Button } from 'react-native'
+import { useTheme } from 'react-native-paper'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import { useTheme } from '@rneui/themed'
 
 import NewTaskScreen from 'src/screens/new-task'
 import CategorySelectionScreen from 'src/screens/new-task/category-selection'
@@ -11,7 +11,7 @@ import { NewTaskStackParamList } from './types'
 const Stack = createNativeStackNavigator<NewTaskStackParamList>()
 
 export default function NewTaskNavigator(): JSX.Element {
-  const { theme } = useTheme()
+  const { colors } = useTheme()
   return (
     <Stack.Navigator initialRouteName='Index'>
       <Stack.Screen
@@ -20,9 +20,9 @@ export default function NewTaskNavigator(): JSX.Element {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: theme.colors.background
+            backgroundColor: colors.background
           },
-          headerTintColor: theme.colors.black,
+          headerTintColor: colors.onBackground,
           headerLeft: () => <Button title='Cancel' onPress={navigation.goBack} />,
           headerTitle: 'New Task',
           headerLargeTitle: true
@@ -34,9 +34,9 @@ export default function NewTaskNavigator(): JSX.Element {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: theme.colors.background
+            backgroundColor: colors.background
           },
-          headerTintColor: theme.colors.black,
+          headerTintColor: colors.onSurface,
           headerLeft: () => <Button title='Back' onPress={navigation.goBack} />,
           headerTitle: 'Category'
         })}
@@ -47,9 +47,9 @@ export default function NewTaskNavigator(): JSX.Element {
         options={({ navigation }) => ({
           headerShown: true,
           headerStyle: {
-            backgroundColor: theme.colors.background
+            backgroundColor: colors.background
           },
-          headerTintColor: theme.colors.black,
+          headerTintColor: colors.onSurface,
           headerLeft: () => <Button title='Back' onPress={navigation.goBack} />,
           headerTitle: 'Location'
         })}

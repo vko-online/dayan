@@ -15,7 +15,7 @@ export class TaskLocation {
   id!: string
 
   @Field()
-  taskId!: string
+  task!: string
 
   @Field()
   altitude!: number

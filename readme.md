@@ -26,3 +26,7 @@ https://github.com/user-attachments/assets/86bec8a1-dfb5-41bd-8de3-27e68e1dba8e
 ### Mobile - in order
 - npm run generate # pulls db schema and generates graphql models/hooks
 - npm run start # or npm run ios/android
+
+
+-- CreateExtension
+CREATE EXTENSION IF NOT EXISTS "postgis";

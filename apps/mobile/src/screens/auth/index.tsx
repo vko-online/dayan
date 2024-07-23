@@ -1,13 +1,11 @@
 import { StyleSheet } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
+import { Button, Divider, HelperText, Text, TextInput, useTheme } from 'react-native-paper'
 import { type ApolloError } from '@apollo/client'
-import { Button, Divider, Input, Text as RneText, useTheme } from '@rneui/themed'
 import { Formik } from 'formik'
 import isEmpty from 'lodash/isEmpty'
 import * as yup from 'yup'
 
 import Box from 'src/components/Box'
-import { Text } from 'src/components/Text'
 import { useSendOtpMutation } from 'src/generated/graphql'
 import { type AuthStackScreenProps } from 'src/navigation/types'
 
@@ -17,9 +15,9 @@ const schema = yup.object().shape({
 
 export default function Auth({ navigation }: AuthStackScreenProps<'Index'>): JSX.Element {
   const [sendOtpAsync, { loading }] = useSendOtpMutation()
-  const { theme } = useTheme()
+  const { colors } = useTheme()
   return (
-    <Box padding={10} flex={1} justifyContent='center' backgroundColor={theme.colors.background}>
+    <Box padding={10} flex={1} justifyContent='center' backgroundColor={colors.background}>
       <Formik
         initialValues={{
           phone: ''
@@ -48,18 +46,19 @@ export default function Auth({ navigation }: AuthStackScreenProps<'Index'>): JSX
         validationSchema={schema}>
         {({ values, handleChange, handleSubmit, touched, errors, isValid }) => (
           <Box>
-            <RneText h1 style={s.title}>
+            <Text variant='displayLarge' style={s.title}>
               DAYAN
-            </RneText>
-            <Input
+            </Text>
+            <TextInput
               value={values.phone}
               onChangeText={handleChange('phone')}
               label='Phone'
               keyboardType='number-pad'
-              renderErrorMessage={touched.phone === true && !isEmpty(errors.phone)}
-              errorMessage={errors.phone}
+              error={touched.phone === true && !isEmpty(errors.phone)}
             />
-            {touched.phone === true && !isEmpty(errors.phone) ? <Text>{errors.phone}</Text> : null}
+            <HelperText type='error' visible={touched.phone === true && !isEmpty(errors.phone)}>
+              {errors.phone}
+            </HelperText>
             <Divider style={s.divider} />
             <Button loading={loading} disabled={!isValid || loading} onPress={() => handleSubmit()}>
               Continue

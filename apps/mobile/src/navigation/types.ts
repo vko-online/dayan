@@ -1,6 +1,8 @@
 import { type NavigatorScreenParams } from '@react-navigation/native'
 import { type NativeStackScreenProps } from '@react-navigation/native-stack'
 
+import { CategoryItem } from 'src/screens/new-task/category-selection'
+
 declare global {
   namespace ReactNavigation {
     interface RootParamList extends RootStackParamList {}
@@ -10,7 +12,7 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<MainStackParamList>
   Auth: NavigatorScreenParams<AuthStackParamList>
   GalleryPreview: undefined
-  NewTask: NavigatorScreenParams<NewTaskStackParamList>
+  NewTask: undefined
 }
 
 export type AuthStackParamList = {
@@ -41,7 +43,8 @@ export type MapLocation = {
 
 export type NewTaskStackParamList = {
   Index: {
-    location: MapLocation | undefined
+    location?: MapLocation
+    category?: CategoryItem
   }
   MapSelection: {
     location: MapLocation | undefined

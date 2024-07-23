@@ -90,7 +90,7 @@ export default class TaskResolver {
     })
 
     await context.prisma.taskLocation.create({
-      taskId: task.id,
+      task: task.id,
       altitude: data.location?.altitude ?? 0,
       location: {
         latitude: data.location?.latitude ?? 0,

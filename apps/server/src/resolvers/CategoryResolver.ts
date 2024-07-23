@@ -15,6 +15,9 @@ export default class CategoryResolver {
     @Arg('input', type => CategoryQueryInput, { nullable: false }) input: CategoryQueryInput,
     @Ctx() context: Context
   ): Promise<Category[]> {
+    if (!input.text) {
+      return await context.prisma.category.findMany()
+    }
     return await context.prisma.category.findMany({
       where: {
         name: {

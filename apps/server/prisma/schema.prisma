@@ -160,7 +160,7 @@ model Task {
 
 model TaskLocation {
   id          String        @id @default(cuid())
-  taskId      String
+  task      String
   altitude  Float
   location    Unsupported("geography(Point, 4326)")
 }

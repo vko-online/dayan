@@ -60,7 +60,7 @@ export class Task {
   state?: NullOrUndefined<TaskState>
 
   @Field(type => String, { nullable: true })
-  addresss?: NullOrUndefined<string>
+  address?: NullOrUndefined<string>
 
   @Field(type => [String])
   images!: string[]

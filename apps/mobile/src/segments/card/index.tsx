@@ -1,26 +1,28 @@
 import React, { forwardRef, useCallback } from 'react'
 import { FlatList, Image, Pressable, StyleSheet, View } from 'react-native'
+import { Icon, Text } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import { useNavigation } from '@react-navigation/native'
-import { Icon, Text, useTheme } from '@rneui/themed'
 
 import BlurredBackground from 'src/components/BlurredBackground'
 import Box from 'src/components/Box'
-import { CARD_HANDLE_HEIGHT, CardHandle } from 'src/components/CardHandle'
-import { Request } from 'src/graphql/types'
+import { CardHandle } from 'src/components/CardHandle'
+import { HANDLE_HEIGHT } from 'src/components/GenericHandle'
+import { useAppTheme } from 'src/components/themes'
+import { TasksQuery } from 'src/generated/graphql'
 interface CardSegmentProps {
   onClose: () => void
   onTitlePress: () => void
   onRespond: () => void
-  item?: Request
+  item?: TasksQuery['tasks'][0]
 }
 const CardSegment = forwardRef<BottomSheetModal, CardSegmentProps>(
   (
     { item, onClose, onTitlePress, onRespond }: CardSegmentProps,
     ref: React.ForwardedRef<BottomSheetModal>
   ) => {
-    const { theme } = useTheme()
+    const { colors } = useAppTheme()
     const { top } = useSafeAreaInsets()
 
     const navigation = useNavigation()
@@ -35,60 +37,60 @@ const CardSegment = forwardRef<BottomSheetModal, CardSegmentProps>(
         name='profileSheet'
         snapPoints={['40%', '100%']}
         topInset={top}
-        handleHeight={CARD_HANDLE_HEIGHT}
+        handleHeight={HANDLE_HEIGHT}
         handleComponent={props => (
           <CardHandle
             {...props}
             onPress={onTitlePress}
             title={item?.title}
-            subtitle={item?.category}
+            subtitle={item?.categoryId}
             onClose={onClose}
           />
         )}
         backgroundComponent={BlurredBackground}>
         <Box paddingHorizontal={15} paddingTop={10}>
-          <Box flexDirection='row' gap={15} marginBottom={10}>
+          <Box flexDirection='row' gap={15}>
             <Pressable
-              style={[s.button, { backgroundColor: theme.colors.primary, width: 100 }]}
+              style={[s.button, { backgroundColor: colors.primary, width: 100 }]}
               onPress={onRespond}>
-              <Icon name='select-all' type='matarialicons' />
+              <Icon source='select-all' size={18} />
               <Text>Respond</Text>
             </Pressable>
-            <Pressable style={[s.button, { backgroundColor: theme.colors.grey5 }]}>
-              <Icon name='call' type='matarialicons' />
+            <Pressable style={[s.button, { backgroundColor: colors.divider }]}>
+              <Icon source='phone' size={18} />
               <Text>Call</Text>
             </Pressable>
-            <Pressable style={[s.button, { backgroundColor: theme.colors.grey5 }]}>
-              <Icon name='message' type='matarialicons' />
+            <Pressable style={[s.button, { backgroundColor: colors.divider }]}>
+              <Icon source='message' size={18} />
               <Text>Text</Text>
             </Pressable>
-            <Pressable style={[s.button, { backgroundColor: theme.colors.grey5 }]}>
-              <Icon name='more-horiz' type='matarialicons' />
+            <Pressable style={[s.button, { backgroundColor: colors.divider }]}>
+              <Icon source='dots-horizontal' size={18} />
             </Pressable>
           </Box>
-          <View style={[s.divider, { backgroundColor: theme.colors.divider }]} />
+          <View style={[s.divider, { backgroundColor: colors.divider }]} />
           <Box flexDirection='row'>
-            <View style={[s.info, { paddingLeft: 0 }]}>
-              <Text style={s.caption}>Price</Text>
+            <View style={s.info}>
+              <Text variant='labelSmall'>Price</Text>
               <Text style={s.value}>{item?.price} $</Text>
             </View>
-            <View style={[s.dividerVertical, { backgroundColor: theme.colors.divider }]} />
+            <View style={[s.dividerVertical, { backgroundColor: colors.divider }]} />
             <View style={s.info}>
-              <Text style={s.caption}>Duration</Text>
+              <Text variant='labelSmall'>Duration</Text>
               <Text style={s.value}>30 min</Text>
             </View>
-            <View style={[s.dividerVertical, { backgroundColor: theme.colors.divider }]} />
+            <View style={[s.dividerVertical, { backgroundColor: colors.divider }]} />
             <View style={s.info}>
-              <Text style={s.caption}>Views</Text>
+              <Text variant='labelSmall'>Views</Text>
               <Text style={s.value}>234</Text>
             </View>
-            <View style={[s.dividerVertical, { backgroundColor: theme.colors.divider }]} />
+            <View style={[s.dividerVertical, { backgroundColor: colors.divider }]} />
             <View style={[s.info, { paddingRight: 0 }]}>
-              <Text style={s.caption}>Distance</Text>
+              <Text variant='labelSmall'>Distance</Text>
               <Text style={s.value}>200 m</Text>
             </View>
           </Box>
-          <View style={[s.divider, { backgroundColor: theme.colors.divider }]} />
+          <View style={[s.divider, { backgroundColor: colors.divider }]} />
 
           <FlatList
             data={item?.images}
@@ -101,7 +103,7 @@ const CardSegment = forwardRef<BottomSheetModal, CardSegmentProps>(
               </Pressable>
             )}
           />
-          <View style={[s.block, { backgroundColor: theme.colors.grey5 }]}>
+          <View style={[s.block, { backgroundColor: colors.elevation.level2 }]}>
             <Text>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nostrum, incidunt.</Text>
           </View>
         </Box>
@@ -147,11 +149,6 @@ const s = StyleSheet.create({
   },
   dividerVertical: {
     width: StyleSheet.hairlineWidth
-  },
-  caption: {
-    color: '#999',
-    textTransform: 'uppercase',
-    fontWeight: 'bold'
   },
   value: {
     fontWeight: 'bold',

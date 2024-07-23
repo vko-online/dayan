@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import { Button, Dimensions, StyleSheet, View } from 'react-native'
 import MapView from 'react-native-maps'
+import { Icon, Text, useTheme } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   NavigationProp,
@@ -9,11 +10,9 @@ import {
   useNavigation,
   useRoute
 } from '@react-navigation/native'
-import { Icon, useTheme } from '@rneui/themed'
 import * as Location from 'expo-location'
 
 import Box, { BlurBox } from 'src/components/Box'
-import { Text } from 'src/components/Text'
 import { NewTaskStackParamList } from 'src/navigation/types'
 
 const SIZE = 50
@@ -28,12 +27,12 @@ export default function MapSelection() {
   const navigation = useNavigation<NavigationProp<NewTaskStackParamList, 'MapSelection'>>()
   const route = useRoute<RouteProp<NewTaskStackParamList, 'MapSelection'>>()
   const { bottom, top } = useSafeAreaInsets()
-  const { theme } = useTheme()
+  const { colors } = useTheme()
   const mapRef = useRef<MapView>(null)
   const handleMyLocation = useCallback(async () => {
     let location = await Location.getCurrentPositionAsync({})
     mapRef.current?.animateCamera({
-      altitude: 500,
+      // altitude: 500,
       center: {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude
@@ -70,13 +69,19 @@ export default function MapSelection() {
         return
       }
       if (route.params?.location?.latitude && route.params?.location?.longitude) {
-        mapRef.current?.animateCamera({
-          altitude: route.params.location.altitude,
-          center: {
-            latitude: route.params.location.latitude,
-            longitude: route.params.location.longitude
+        console.log('route.params?.location', route.params?.location)
+        mapRef.current?.animateCamera(
+          {
+            altitude: route.params.location.altitude,
+            center: {
+              latitude: route.params.location.latitude,
+              longitude: route.params.location.longitude
+            }
+          },
+          {
+            duration: 1000
           }
-        })
+        )
         return
       }
 
@@ -84,9 +89,9 @@ export default function MapSelection() {
     })()
   }, [handleMyLocation, route])
   return (
-    <Box flex={1} backgroundColor={theme.colors.background}>
+    <Box flex={1} backgroundColor={colors.background}>
       <MapView
-        mapPadding={{ top: 40, left: 0, right: 0, bottom: 0 }}
+        mapPadding={{ bottom, top, left: 0, right: 0 }}
         ref={mapRef}
         mapType='hybrid'
         showsUserLocation
@@ -95,9 +100,29 @@ export default function MapSelection() {
       <BlurBox height={40} alignItems='center' justifyContent='center' padding={10}>
         <Text>Pan and zoom map to refine location</Text>
       </BlurBox>
-      <View style={[s.centerMarker, { top: height / 2 - SIZE / 2 - top - bottom }]}>
-        <Icon name='location-pin' size={SIZE} color={theme.colors.grey0} />
+      <View style={[s.centerMarker, { top: height / 2 - SIZE / 3 - top - bottom }]}>
+        <Icon source='location-pin' size={SIZE} color={colors.backdrop} />
       </View>
+      {/* <View
+        style={{
+          position: 'absolute',
+          top: '0%',
+          left: '50%',
+          width: 1,
+          height: '100%',
+          backgroundColor: 'yellow'
+        }}
+      />
+      <View
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '0%',
+          width: '100%',
+          height: 1,
+          backgroundColor: 'yellow'
+        }}
+      /> */}
     </Box>
   )
 }
@@ -107,6 +132,13 @@ const s = StyleSheet.create({
     flex: 1
   },
   centerMarker: {
+    shadowColor: 'black',
+    shadowOffset: {
+      height: 1,
+      width: 1
+    },
+    shadowOpacity: 1,
+    shadowRadius: 5,
     position: 'absolute',
     left: width / 2 - SIZE / 2
   }

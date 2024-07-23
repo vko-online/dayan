@@ -1,9 +1,9 @@
 import React from 'react'
 import { Dimensions, StyleSheet } from 'react-native'
+import { Button } from 'react-native-paper'
 import Animated, { interpolate, SharedValue, useAnimatedStyle } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
-import { Button, Icon } from '@rneui/themed'
 
 interface Props {
   animatedPosition: SharedValue<number>
@@ -21,32 +21,19 @@ export default function ActionBar({ animatedPosition }: Props) {
         [top, 300, 300 + bottom, height - bottom, height],
         [0, 0, 1, 1, 0]
       ),
-      top: animatedPosition.value - 160
+      top: animatedPosition.value - 40
     }
   }, [animatedPosition])
 
   return (
     <Animated.View style={[s.container, animatedStyle]}>
       <Button
-        color='primary'
+        icon='plus'
         onPress={() => {
           navigation.navigate('NewTask')
         }}
-        buttonStyle={s.button}>
-        <Icon name='add' color='white' />
+        mode='contained'>
         New task
-      </Button>
-      <Button color='success' buttonStyle={s.button}>
-        <Icon name='select-all' color='white' />
-        Active task
-      </Button>
-      <Button color='secondary' buttonStyle={s.button}>
-        <Icon name='message' color='white' />
-        New message
-      </Button>
-      <Button color='warning' buttonStyle={s.button}>
-        <Icon name='grade' color='white' />
-        Awaiting review
       </Button>
     </Animated.View>
   )

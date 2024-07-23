@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react'
+import { Button } from 'react-native-paper'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
-import { Button } from '@rneui/themed'
 
 import BlurredBackground from 'src/components/BlurredBackground'
 import Box from 'src/components/Box'

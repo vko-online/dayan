@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import { Pressable, StyleSheet } from 'react-native'
 import MapView, { Marker } from 'react-native-maps'
+import { Text } from 'react-native-paper'
 import * as Location from 'expo-location'
 
 import Box, { BlurBox } from 'src/components/Box'
 import Surface from 'src/components/Surface'
-import { Text } from 'src/components/Text'
 import { MapLocation } from 'src/navigation/types'
 
 interface MapInputProps {
@@ -49,13 +49,7 @@ export default function MapInput({ location, onPress }: MapInputProps) {
   return (
     <Pressable onPress={onPress}>
       <Surface padding={0} overflow='hidden' marginBottom={20}>
-        <MapView
-          mapPadding={{ bottom: 40, top: 0, right: 0, left: 0 }}
-          pointerEvents='none'
-          ref={mapRef}
-          mapType='hybrid'
-          showsUserLocation
-          style={s.map}>
+        <MapView pointerEvents='none' ref={mapRef} mapType='hybrid' showsUserLocation style={s.map}>
           {location?.latitude && location?.longitude ? (
             <Marker
               coordinate={{

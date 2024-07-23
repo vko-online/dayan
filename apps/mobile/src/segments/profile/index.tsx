@@ -1,10 +1,11 @@
 import React, { forwardRef } from 'react'
+import { List } from 'react-native-paper'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
-import { Icon, ListItem, useTheme } from '@rneui/themed'
 
 import BlurredBackground from 'src/components/BlurredBackground'
 import Box from 'src/components/Box'
-import { PROFILE_HANDLE_HEIGHT, ProfileHandle } from 'src/components/ProfileHandle'
+import { HANDLE_WIDTH } from 'src/components/GenericHandle'
+import { ProfileHandle } from 'src/components/ProfileHandle'
 import { useMeQuery } from 'src/generated/graphql'
 
 interface ProfileProps {
@@ -12,15 +13,14 @@ interface ProfileProps {
 }
 const ProfileSegment = forwardRef<BottomSheetModal, ProfileProps>(
   ({ onClose }: ProfileProps, ref: React.ForwardedRef<BottomSheetModal>) => {
-    const { data, loading, error } = useMeQuery()
-    const { theme } = useTheme()
+    const { data } = useMeQuery()
     return (
       <BottomSheetModal
         ref={ref}
         key='profileSheet'
         name='profileSheet'
         snapPoints={['40%']}
-        handleHeight={PROFILE_HANDLE_HEIGHT}
+        handleHeight={HANDLE_WIDTH}
         handleComponent={props => (
           <ProfileHandle
             {...props}
@@ -30,42 +30,15 @@ const ProfileSegment = forwardRef<BottomSheetModal, ProfileProps>(
           />
         )}
         backgroundComponent={BlurredBackground}>
-        <Box marginHorizontal={theme.spacing.lg} borderRadius={15} overflow='hidden'>
-          <ListItem bottomDivider containerStyle={{ backgroundColor: theme.colors.background }}>
-            <Icon name='inbox' type='material-community' color='grey' />
-            <ListItem.Content>
-              <ListItem.Title>Watchlist</ListItem.Title>
-            </ListItem.Content>
-            <ListItem.Chevron />
-          </ListItem>
-          <ListItem bottomDivider>
-            <Icon name='archive' type='material-community' color='grey' />
-            <ListItem.Content>
-              <ListItem.Title>Archive</ListItem.Title>
-            </ListItem.Content>
-            <ListItem.Chevron />
-          </ListItem>
-          <ListItem bottomDivider>
-            <Icon name='archive' type='material-community' color='grey' />
-            <ListItem.Content>
-              <ListItem.Title>Archive</ListItem.Title>
-            </ListItem.Content>
-            <ListItem.Chevron />
-          </ListItem>
-          <ListItem bottomDivider>
-            <Icon name='archive' type='material-community' color='grey' />
-            <ListItem.Content>
-              <ListItem.Title>Archive</ListItem.Title>
-            </ListItem.Content>
-            <ListItem.Chevron />
-          </ListItem>
-          <ListItem>
-            <Icon name='cog' type='material-community' color='grey' />
-            <ListItem.Content>
-              <ListItem.Title>Preferences</ListItem.Title>
-            </ListItem.Content>
-            <ListItem.Chevron />
-          </ListItem>
+        <Box marginHorizontal={15} borderRadius={15} overflow='hidden'>
+          <List.Item
+            title='Watchlist'
+            right={props => <List.Icon {...props} icon='chevron-right' />}
+          />
+          <List.Item
+            title='Archive'
+            right={props => <List.Icon {...props} icon='chevron-right' />}
+          />
         </Box>
       </BottomSheetModal>
     )

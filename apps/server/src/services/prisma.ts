@@ -1,3 +1,4 @@
+import { createId } from '@paralleldrive/cuid2'
 import { PrismaClient } from '@prisma/client'
 import { TaskLocation } from '@prisma/client/wasm'
 
@@ -12,7 +13,7 @@ const prismaExtended = new PrismaClient().$extends({
   model: {
     taskLocation: {
       async create(data: {
-        taskId: string
+        task: string
         altitude: number
         location: {
           latitude: number
@@ -21,14 +22,15 @@ const prismaExtended = new PrismaClient().$extends({
       }) {
         // Create an object using the custom types from above
         const taskLocation = {
-          taskId: data.taskId,
+          id: createId(),
+          task: data.task,
           altitude: data.altitude
         }
 
         // Insert the object into the database
         const point = `POINT(${data.location.longitude} ${data.location.latitude})`
         await prismaExtended.$queryRaw`
-          INSERT INTO "TaskLocation" (taskId, altitude, location) VALUES (${taskLocation.taskId}, ${taskLocation.altitude}, ST_GeomFromText(${point}, 4326));
+          INSERT INTO "TaskLocation" (id, task, altitude, location) VALUES (${taskLocation.id}, ${taskLocation.task}, ${taskLocation.altitude}, ST_GeomFromText(${point}, 4326));
         `
         // Return the object
         return taskLocation
@@ -38,12 +40,12 @@ const prismaExtended = new PrismaClient().$extends({
         const result = await prisma.$queryRaw<
           {
             id: string | null
-            taskId: string | null
+            task: string | null
             altitude: number | null
             st_x: number | null
             st_y: number | null
           }[]
-        >`SELECT id, taskId, altitude, ST_X(location::geometry), ST_Y(location::geometry) 
+        >`SELECT id, task, altitude, ST_X(location::geometry), ST_Y(location::geometry) 
             FROM "TaskLocation" 
             ORDER BY ST_DistanceSphere(location::geometry, ST_MakePoint(${longitude}, ${latitude})) DESC`
 
@@ -51,11 +53,11 @@ const prismaExtended = new PrismaClient().$extends({
         const taskLocations: TaskLocationWithExtra[] = result.map((data: any) => {
           return {
             id: data.id ?? '',
-            taskId: data.taskId ?? '',
+            task: data.task ?? '',
             altitude: data.altitude ?? 0,
             location: {
-              latitude: data.st_x ?? 0,
-              longitude: data.st_y ?? 0
+              latitude: data.st_y ?? 0,
+              longitude: data.st_x ?? 0
             }
           }
         })
@@ -68,24 +70,25 @@ const prismaExtended = new PrismaClient().$extends({
         const result = await prisma.$queryRaw<
           {
             id: string | null
-            taskId: string | null
+            task: string | null
             altitude: number | null
             st_x: number | null
             st_y: number | null
           }[]
-        >`SELECT id, taskId, altitude, ST_X(location::geometry), ST_Y(location::geometry) 
+        >`SELECT id, task, altitude, ST_X(location::geometry), ST_Y(location::geometry) 
             FROM "TaskLocation" 
-            WHERE taskId = ${id}`
+            WHERE task = ${id}`
 
+        console.log('result', result)
         if (result.length > 0) {
           const data = result[0]
           return {
             id: data.id ?? '',
-            taskId: data.taskId ?? '',
+            task: data.task ?? '',
             altitude: data.altitude ?? 0,
             location: {
-              latitude: data.st_x ?? 0,
-              longitude: data.st_y ?? 0
+              latitude: data.st_y ?? 0,
+              longitude: data.st_x ?? 0
             }
           }
         }
