@@ -27,7 +27,7 @@ export class User {
   @Field(type => String, { nullable: true })
   photo?: NullOrUndefined<string>
 }
-
+// todo: do we need interface for User & UserPartial?
 @ObjectType('UserPartial')
 export class UserPartial {
   @Field()

@@ -1,99 +1,54 @@
+import { GraphQLVoid } from 'graphql-scalars'
 import Upload, { FileUpload } from 'graphql-upload/Upload.mjs'
 import { Context } from 'src/context.ts'
-import { File, User } from 'src/models/index.ts'
+import { User } from 'src/models/index.ts'
 import { deleteFileById, saveFile } from 'src/services/fileUpload.ts'
-import { assertAuth } from 'src/utils/assert.ts'
-import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
-
-@InputType()
-class UpdateImageInput {
-  @Field(() => Upload, { nullable: false })
-  file!: FileUpload
-
-  @Field(() => String, { nullable: false })
-  id!: string
-}
-
-@InputType()
-class PresenceInput {
-  @Field(() => Boolean, { nullable: true })
-  online?: boolean
-}
+import { assertAuth, assertObject } from 'src/utils/assert.ts'
+import { Arg, Authorized, Ctx, Mutation, Query, Resolver } from 'type-graphql'
 
 @Resolver()
 export default class MeResolver {
-  @Authorized()
-  @Mutation(() => Boolean)
-  async updatePresence(
-    @Arg('input', () => PresenceInput) input: PresenceInput,
-    @Ctx() context: Context
-  ): Promise<boolean> {
-    // await updateUser({
-    //   id: context.currentUserId as string,
-    //   online: input.online ?? false
-    // })
-    return true
-  }
+  // use subscription session
+  // to detect user presence (online/offline)
+
+  // @Authorized()
+  // @Mutation(() => Boolean)
+  // async updatePresence(
+  //   @Arg('input', () => PresenceInput) input: PresenceInput,
+  //   @Ctx() context: Context
+  // ): Promise<boolean> {
+  //   // await updateUser({
+  //   //   id: context.currentUserId as string,
+  //   //   online: input.online ?? false
+  //   // })
+  //   return true
+  // }
 
   @Authorized()
-  @Mutation(() => [File])
-  async uploadImage(
-    @Arg('input', () => [Upload]) input: FileUpload[],
-    @Ctx() context: Context
-  ): Promise<File[]> {
-    assertAuth(context)
-    const files: File[] = []
-    for (const item of input) {
-      const file = await saveFile(item)
-      const profile = await context.prisma.user.findFirst({
-        where: {
-          id: context.currentUserId
-        }
-      })
-
-      if (profile) {
-        await context.prisma.user.update({
-          where: {
-            id: profile.id
-          },
-          data: {
-            photo: file.id
-          }
-        })
-      }
-      files.push(file)
-    }
-    return files
-  }
-
-  @Authorized()
-  @Mutation(() => [File])
+  @Mutation(() => GraphQLVoid)
   async updateImage(
-    @Arg('input', () => UpdateImageInput) input: UpdateImageInput,
+    @Arg('file', () => Upload) file: FileUpload,
     @Ctx() context: Context
-  ): Promise<File> {
+  ): Promise<void> {
     assertAuth(context)
     const profile = await context.prisma.user.findFirst({
       where: {
         id: context.currentUserId
       }
     })
-    if (profile) {
-      if (profile.photo != null) {
-        await deleteFileById(profile.photo)
-      }
-      const file = await saveFile(input.file)
-      await context.prisma.user.update({
-        where: {
-          id: profile.id
-        },
-        data: {
-          photo: file.id
-        }
-      })
-      return file
+    assertObject(profile, 'Profile not found')
+    if (profile.photo != null) {
+      await deleteFileById(profile.photo)
     }
-    throw new Error('Profile not found')
+    const savedFile = await saveFile(file)
+    await context.prisma.user.update({
+      where: {
+        id: profile.id
+      },
+      data: {
+        photo: savedFile.id
+      }
+    })
   }
 
   @Authorized()

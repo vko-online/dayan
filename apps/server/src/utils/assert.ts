@@ -5,20 +5,26 @@ type NonNullContext = Context & {
   currentUserId: string
 }
 
-export function assertAuth(context: Context): asserts context is NonNullContext {
+export function assertAuth(
+  context: Context,
+  message = 'Unauthorized'
+): asserts context is NonNullContext {
   if (typeof context.currentUserId !== 'string') {
-    throw new GraphQLError('Unauthorized')
+    throw new GraphQLError(message)
   }
 }
 
-export function assertId(id: unknown): asserts id is string {
+export function assertId(id: unknown, message = 'Invalid ID'): asserts id is string {
   if (typeof id !== 'string') {
-    throw new GraphQLError('Invalid ID')
+    throw new GraphQLError(message)
   }
 }
 
-export function assertObject<T extends unknown>(obj: T): asserts obj is NonNullable<T> {
+export function assertObject<T extends unknown>(
+  obj: T,
+  message = 'Object not found'
+): asserts obj is NonNullable<T> {
   if (obj == null) {
-    throw new GraphQLError('Object not found')
+    throw new GraphQLError(message)
   }
 }
