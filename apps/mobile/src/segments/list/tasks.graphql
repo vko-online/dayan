@@ -12,6 +12,11 @@ query tasks {
     address
     images
     categoryId
+    category {
+      name
+      description
+      image
+    }
     location {
       altitude
       location {

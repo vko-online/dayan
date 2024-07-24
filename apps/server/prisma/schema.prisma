@@ -63,6 +63,12 @@ model Review {
   images    String[]
 }
 
+model UserFavories {
+  userId    String @id
+  taskId String
+  createdAt DateTime @default(now())
+}
+
 enum ActivityType {
   SERVICE_STATUS_CHANGED
   REVIEW_RECEIVED

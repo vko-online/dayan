@@ -43,7 +43,7 @@ const CardSegment = forwardRef<BottomSheetModal, CardSegmentProps>(
             {...props}
             onPress={onTitlePress}
             title={item?.title}
-            subtitle={item?.categoryId}
+            subtitle={item?.category?.name}
             onClose={onClose}
           />
         )}

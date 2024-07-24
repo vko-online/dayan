@@ -1,5 +1,6 @@
 import { TaskPayment, TaskPaymentType, TaskState, TaskStatus } from '@prisma/client/wasm'
 import { Context } from 'src/context.ts'
+import { assertAuth } from 'src/utils/assert.ts'
 import { NullOrUndefined } from 'src/utils/type.ts'
 import {
   ObjectType,
@@ -11,6 +12,7 @@ import {
   Root
 } from 'type-graphql'
 
+import { Category } from './Category.ts'
 import { TaskLocation } from './TaskLocation.ts'
 import { UserPartial } from './User.ts'
 
@@ -89,6 +91,31 @@ export class TaskRelationResolver {
         photo: true
       }
     })
+  }
+
+  @FieldResolver(() => Boolean)
+  async favorited(@Root() task: Task, @Ctx() context: Context) {
+    assertAuth(context)
+    const currentUserId = context.currentUserId
+    const exists = await context.prisma.userFavories.findFirst({
+      where: {
+        userId: currentUserId,
+        taskId: task.id
+      }
+    })
+    return exists != null
+  }
+
+  @FieldResolver(type => Category, { nullable: true })
+  category(@Root() task: Task, @Ctx() context: Context) {
+    if (task.categoryId) {
+      return context.prisma.category.findFirst({
+        where: {
+          id: task.categoryId
+        }
+      })
+    }
+    return null
   }
 
   @FieldResolver(type => TaskLocation, { nullable: true })

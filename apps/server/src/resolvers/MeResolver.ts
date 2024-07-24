@@ -2,6 +2,7 @@ import Upload, { FileUpload } from 'graphql-upload/Upload.mjs'
 import { Context } from 'src/context.ts'
 import { File, User } from 'src/models/index.ts'
 import { deleteFileById, saveFile } from 'src/services/fileUpload.ts'
+import { assertAuth } from 'src/utils/assert.ts'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 
 @InputType()
@@ -40,12 +41,13 @@ export default class MeResolver {
     @Arg('input', () => [Upload]) input: FileUpload[],
     @Ctx() context: Context
   ): Promise<File[]> {
+    assertAuth(context)
     const files: File[] = []
     for (const item of input) {
       const file = await saveFile(item)
       const profile = await context.prisma.user.findFirst({
         where: {
-          id: context.currentUserId as string
+          id: context.currentUserId
         }
       })
 
@@ -70,9 +72,10 @@ export default class MeResolver {
     @Arg('input', () => UpdateImageInput) input: UpdateImageInput,
     @Ctx() context: Context
   ): Promise<File> {
+    assertAuth(context)
     const profile = await context.prisma.user.findFirst({
       where: {
-        id: context.currentUserId as string
+        id: context.currentUserId
       }
     })
     if (profile) {
@@ -96,9 +99,10 @@ export default class MeResolver {
   @Authorized()
   @Query(() => User, { nullable: true })
   async me(@Ctx() context: Context): Promise<User | null> {
+    assertAuth(context)
     return await context.prisma.user.findFirst({
       where: {
-        id: context.currentUserId as string
+        id: context.currentUserId
       }
     })
   }

@@ -3,6 +3,7 @@ import Upload, { FileUpload } from 'graphql-upload/Upload.mjs'
 import { Context } from 'src/context.ts'
 import { File, Task } from 'src/models/index.ts'
 import { saveFile } from 'src/services/fileUpload.ts'
+import { assertAuth, assertObject } from 'src/utils/assert.ts'
 import { NullOrUndefined } from 'src/utils/type.ts'
 import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
 
@@ -17,14 +18,6 @@ class LocationWithAltitudeInput {
   @Field()
   longitude!: number
 }
-
-// class LocationInput {
-//   @Field()
-//   latitude!: number
-
-//   @Field()
-//   longitude!: number
-// }
 
 @InputType()
 class TaskInput {
@@ -122,6 +115,43 @@ export default class TaskResolver {
         authorId: currentUserId
       }
     })
+  }
+
+  @Authorized()
+  @Mutation(() => Task, { nullable: true })
+  async toggleFavorite(
+    @Ctx() context: Context,
+    @Arg('taskId', () => String) taskId: string
+  ): Promise<Task | null> {
+    assertAuth(context)
+    const task = await context.prisma.task.findFirst({
+      where: {
+        id: taskId
+      }
+    })
+    assertObject(task)
+    const currentUserId = context.currentUserId as string
+    const exists = await context.prisma.userFavories.findFirst({
+      where: {
+        userId: currentUserId,
+        taskId
+      }
+    })
+    if (exists) {
+      await context.prisma.userFavories.delete({
+        where: {
+          userId: exists.userId
+        }
+      })
+    } else {
+      await context.prisma.userFavories.create({
+        data: {
+          userId: currentUserId,
+          taskId
+        }
+      })
+    }
+    return task
   }
 
   // @Authorized()

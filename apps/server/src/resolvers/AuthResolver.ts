@@ -118,14 +118,18 @@ export default class AuthResolver {
 
   @Mutation(() => Boolean, { nullable: true })
   async signOut(@Ctx() context: Context): Promise<boolean> {
-    await context.prisma.user.update({
-      where: {
-        id: context.currentUserId as string
-      },
-      data: {
-        pushId: null
-      }
-    })
+    const currentUserId = context.currentUserId
+    if (currentUserId) {
+      await context.prisma.user.update({
+        where: {
+          id: currentUserId
+        },
+        data: {
+          pushId: null
+        }
+      })
+    }
+
     return true
   }
 }

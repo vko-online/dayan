@@ -229,6 +229,7 @@ export type Task = {
   address?: Maybe<Scalars['String']>;
   author: UserPartial;
   authorId: Scalars['String'];
+  category?: Maybe<Category>;
   categoryId?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   date?: Maybe<Scalars['DateTime']>;
@@ -355,7 +356,7 @@ export type SearchCategoryQuery = { __typename?: 'Query', searchCategory: Array<
 export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type TasksQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', id: string, title: string, description: string, status?: TaskStatus | null, price?: number | null, paymentType?: TaskPaymentType | null, payment?: TaskPayment | null, date?: any | null, state?: TaskState | null, address?: string | null, images: Array<string>, categoryId?: string | null, location?: { __typename?: 'TaskLocation', altitude: number, location: { __typename?: 'GeoLocation', latitude: number, longitude: number } } | null }> };
+export type TasksQuery = { __typename?: 'Query', tasks: Array<{ __typename?: 'Task', id: string, title: string, description: string, status?: TaskStatus | null, price?: number | null, paymentType?: TaskPaymentType | null, payment?: TaskPayment | null, date?: any | null, state?: TaskState | null, address?: string | null, images: Array<string>, categoryId?: string | null, category?: { __typename?: 'Category', name: string, description?: string | null, image?: string | null } | null, location?: { __typename?: 'TaskLocation', altitude: number, location: { __typename?: 'GeoLocation', latitude: number, longitude: number } } | null }> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -521,6 +522,11 @@ export const TasksDocument = gql`
     address
     images
     categoryId
+    category {
+      name
+      description
+      image
+    }
     location {
       altitude
       location {

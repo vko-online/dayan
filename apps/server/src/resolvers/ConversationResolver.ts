@@ -3,6 +3,7 @@ import { NotificationType } from 'src/constants/topics.ts'
 import { Context } from 'src/context.ts'
 import { Conversation, Message } from 'src/models/index.ts'
 import { sendOrPublish } from 'src/services/broker.ts'
+import { assertAuth, assertObject } from 'src/utils/assert.ts'
 import {
   Arg,
   Authorized,
@@ -49,11 +50,12 @@ export default class ConversationResolver {
   @Authorized()
   @Query(() => [Conversation])
   async conversations(@Ctx() context: Context): Promise<Conversation[]> {
+    assertAuth(context)
     return await context.prisma.conversation.findMany({
       where: {
         members: {
           some: {
-            id: context.currentUserId as string
+            id: context.currentUserId
           }
         }
       },
@@ -69,6 +71,7 @@ export default class ConversationResolver {
     @Arg('messageIds', () => [String], { nullable: false }) messageIds: string[],
     @Ctx() context: Context
   ): Promise<BatchPayload> {
+    assertAuth(context)
     return await context.prisma.message.updateMany({
       where: {
         id: {
@@ -76,13 +79,13 @@ export default class ConversationResolver {
         },
         NOT: {
           readByIds: {
-            hasEvery: [context.currentUserId as string]
+            hasEvery: [context.currentUserId]
           }
         }
       },
       data: {
         readByIds: {
-          push: context.currentUserId as string
+          push: context.currentUserId
         }
       }
     })
@@ -94,6 +97,7 @@ export default class ConversationResolver {
     @Arg('messageIds', () => [String], { nullable: false }) messageIds: string[],
     @Ctx() context: Context
   ): Promise<BatchPayload> {
+    assertAuth(context)
     return await context.prisma.message.updateMany({
       where: {
         id: {
@@ -101,13 +105,13 @@ export default class ConversationResolver {
         },
         NOT: {
           receivedByIds: {
-            hasEvery: [context.currentUserId as string]
+            hasEvery: [context.currentUserId]
           }
         }
       },
       data: {
         receivedByIds: {
-          push: context.currentUserId as string
+          push: context.currentUserId
         }
       }
     })
@@ -119,11 +123,13 @@ export default class ConversationResolver {
     @Arg('input') input: ConversationInput,
     @Ctx() context: Context
   ): Promise<Message> {
+    assertAuth(context)
     const currentUser = await context.prisma.user.findFirst({
       where: {
-        id: context.currentUserId as string
+        id: context.currentUserId
       }
     })
+    assertObject(currentUser)
 
     let content = input.content
 
@@ -139,14 +145,14 @@ export default class ConversationResolver {
         content,
         author: {
           connect: {
-            id: context.currentUserId as string
+            id: context.currentUserId
           }
         },
         readByIds: {
-          set: [context.currentUserId as string]
+          set: [context.currentUserId]
         },
         receivedByIds: {
-          set: [context.currentUserId as string]
+          set: [context.currentUserId]
         }
       }
     })
@@ -172,7 +178,7 @@ export default class ConversationResolver {
     if (convo != null) {
       const [targetId] = convo.members
         .map((v: any) => v.id)
-        .filter((v: any) => v !== (context.currentUserId as string))
+        .filter((v: any) => v !== context.currentUserId)
 
       const messageWithTargetIds: MessageWithTargetIds = {
         targetId,
@@ -189,7 +195,7 @@ export default class ConversationResolver {
         message: {
           badge: 1,
           title: 'You have new message',
-          subtitle: `New message from ${currentUser?.name ?? (currentUser?.phone as string)}`,
+          subtitle: `New message from ${currentUser.name ?? currentUser.phone}`,
           body: 'New message'
         }
       })

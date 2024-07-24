@@ -33,7 +33,7 @@ export default function DataSection({ data, onSelect }: DataSectionProps) {
         <List.Item
           onPress={() => onSelect(item)}
           title={item.title}
-          description={item.categoryId}
+          description={item.category?.name}
           right={() => <Text>{item.price}$</Text>}
         />
       )}
