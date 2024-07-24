@@ -63,10 +63,16 @@ model Review {
   images    String[]
 }
 
-model UserFavories {
+// rename to UserFavorites
+model UserFavorites {
   userId    String @id
   taskId String
   createdAt DateTime @default(now())
+}
+
+model TaskView {
+  userId    String @id
+  taskId String
 }
 
 enum ActivityType {

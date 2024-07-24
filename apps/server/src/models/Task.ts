@@ -9,7 +9,8 @@ import {
   FieldResolver,
   Ctx,
   Resolver,
-  Root
+  Root,
+  Int
 } from 'type-graphql'
 
 import { Category } from './Category.ts'
@@ -97,7 +98,7 @@ export class TaskRelationResolver {
   async favorited(@Root() task: Task, @Ctx() context: Context) {
     assertAuth(context)
     const currentUserId = context.currentUserId
-    const exists = await context.prisma.userFavories.findFirst({
+    const exists = await context.prisma.userFavorites.findFirst({
       where: {
         userId: currentUserId,
         taskId: task.id
@@ -116,6 +117,15 @@ export class TaskRelationResolver {
       })
     }
     return null
+  }
+
+  @FieldResolver(type => Int, { nullable: false })
+  views(@Root() task: Task, @Ctx() context: Context) {
+    return context.prisma.taskView.count({
+      where: {
+        taskId: task.id
+      }
+    })
   }
 
   @FieldResolver(type => TaskLocation, { nullable: true })

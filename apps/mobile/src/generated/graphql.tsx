@@ -15,6 +15,7 @@ export type Scalars = {
   Float: number;
   DateTime: any;
   Upload: any;
+  Void: any;
 };
 
 export type BatchPayload = {
@@ -114,6 +115,8 @@ export type Mutation = {
   sendNotification: Scalars['Float'];
   sendOTP: SendCodePayload;
   signOut?: Maybe<Scalars['Boolean']>;
+  toggleFavorite?: Maybe<Scalars['Void']>;
+  trackView?: Maybe<Scalars['Void']>;
   updateImage: Array<File>;
   updatePresence: Scalars['Boolean'];
   updateState?: Maybe<Scalars['Boolean']>;
@@ -153,6 +156,16 @@ export type MutationSendNotificationArgs = {
 
 export type MutationSendOtpArgs = {
   input: SendCodeInput;
+};
+
+
+export type MutationToggleFavoriteArgs = {
+  taskId: Scalars['ID'];
+};
+
+
+export type MutationTrackViewArgs = {
+  taskId: Scalars['ID'];
 };
 
 
@@ -235,6 +248,7 @@ export type Task = {
   date?: Maybe<Scalars['DateTime']>;
   description: Scalars['String'];
   executorId?: Maybe<Scalars['String']>;
+  favorited: Scalars['Boolean'];
   id: Scalars['String'];
   images: Array<Scalars['String']>;
   location?: Maybe<TaskLocation>;
@@ -352,6 +366,20 @@ export type SearchCategoryQueryVariables = Exact<{
 
 
 export type SearchCategoryQuery = { __typename?: 'Query', searchCategory: Array<{ __typename?: 'Category', id: string, name: string, description?: string | null, image?: string | null }> };
+
+export type ToggleFavoriteMutationVariables = Exact<{
+  taskId: Scalars['ID'];
+}>;
+
+
+export type ToggleFavoriteMutation = { __typename?: 'Mutation', toggleFavorite?: any | null };
+
+export type TrackViewMutationVariables = Exact<{
+  taskId: Scalars['ID'];
+}>;
+
+
+export type TrackViewMutation = { __typename?: 'Mutation', trackView?: any | null };
 
 export type TasksQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -507,6 +535,68 @@ export function useSearchCategoryLazyQuery(baseOptions?: Apollo.LazyQueryHookOpt
 export type SearchCategoryQueryHookResult = ReturnType<typeof useSearchCategoryQuery>;
 export type SearchCategoryLazyQueryHookResult = ReturnType<typeof useSearchCategoryLazyQuery>;
 export type SearchCategoryQueryResult = Apollo.QueryResult<SearchCategoryQuery, SearchCategoryQueryVariables>;
+export const ToggleFavoriteDocument = gql`
+    mutation toggleFavorite($taskId: ID!) {
+  toggleFavorite(taskId: $taskId)
+}
+    `;
+export type ToggleFavoriteMutationFn = Apollo.MutationFunction<ToggleFavoriteMutation, ToggleFavoriteMutationVariables>;
+
+/**
+ * __useToggleFavoriteMutation__
+ *
+ * To run a mutation, you first call `useToggleFavoriteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleFavoriteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleFavoriteMutation, { data, loading, error }] = useToggleFavoriteMutation({
+ *   variables: {
+ *      taskId: // value for 'taskId'
+ *   },
+ * });
+ */
+export function useToggleFavoriteMutation(baseOptions?: Apollo.MutationHookOptions<ToggleFavoriteMutation, ToggleFavoriteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ToggleFavoriteMutation, ToggleFavoriteMutationVariables>(ToggleFavoriteDocument, options);
+      }
+export type ToggleFavoriteMutationHookResult = ReturnType<typeof useToggleFavoriteMutation>;
+export type ToggleFavoriteMutationResult = Apollo.MutationResult<ToggleFavoriteMutation>;
+export type ToggleFavoriteMutationOptions = Apollo.BaseMutationOptions<ToggleFavoriteMutation, ToggleFavoriteMutationVariables>;
+export const TrackViewDocument = gql`
+    mutation trackView($taskId: ID!) {
+  trackView(taskId: $taskId)
+}
+    `;
+export type TrackViewMutationFn = Apollo.MutationFunction<TrackViewMutation, TrackViewMutationVariables>;
+
+/**
+ * __useTrackViewMutation__
+ *
+ * To run a mutation, you first call `useTrackViewMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useTrackViewMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [trackViewMutation, { data, loading, error }] = useTrackViewMutation({
+ *   variables: {
+ *      taskId: // value for 'taskId'
+ *   },
+ * });
+ */
+export function useTrackViewMutation(baseOptions?: Apollo.MutationHookOptions<TrackViewMutation, TrackViewMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<TrackViewMutation, TrackViewMutationVariables>(TrackViewDocument, options);
+      }
+export type TrackViewMutationHookResult = ReturnType<typeof useTrackViewMutation>;
+export type TrackViewMutationResult = Apollo.MutationResult<TrackViewMutation>;
+export type TrackViewMutationOptions = Apollo.BaseMutationOptions<TrackViewMutation, TrackViewMutationVariables>;
 export const TasksDocument = gql`
     query tasks {
   tasks {

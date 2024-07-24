@@ -1,0 +1,3 @@
+mutation trackView($taskId: ID!) {
+  trackView(taskId: $taskId)
+}

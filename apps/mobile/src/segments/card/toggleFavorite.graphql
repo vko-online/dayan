@@ -1,0 +1,3 @@
+mutation toggleFavorite($taskId: ID!) {
+  toggleFavorite(taskId: $taskId)
+}

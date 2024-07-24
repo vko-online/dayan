@@ -1,11 +1,12 @@
 import { TaskPayment, TaskPaymentType } from '@prisma/client/wasm'
+import { GraphQLVoid } from 'graphql-scalars'
 import Upload, { FileUpload } from 'graphql-upload/Upload.mjs'
 import { Context } from 'src/context.ts'
-import { File, Task } from 'src/models/index.ts'
+import { File, Task, TaskLocation } from 'src/models/index.ts'
 import { saveFile } from 'src/services/fileUpload.ts'
 import { assertAuth, assertObject } from 'src/utils/assert.ts'
 import { NullOrUndefined } from 'src/utils/type.ts'
-import { Arg, Authorized, Ctx, Field, InputType, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Authorized, Ctx, Field, ID, InputType, Mutation, Query, Resolver } from 'type-graphql'
 
 @InputType()
 class LocationWithAltitudeInput {
@@ -48,6 +49,15 @@ class TaskInput {
 
   @Field(() => [Upload], { nullable: true })
   images?: NullOrUndefined<FileUpload[]>
+}
+
+@InputType()
+class LocationInput {
+  @Field()
+  latitude!: number
+
+  @Field()
+  longitude!: number
 }
 
 @Resolver()
@@ -118,11 +128,11 @@ export default class TaskResolver {
   }
 
   @Authorized()
-  @Mutation(() => Task, { nullable: true })
+  @Mutation(() => GraphQLVoid, { nullable: true })
   async toggleFavorite(
     @Ctx() context: Context,
-    @Arg('taskId', () => String) taskId: string
-  ): Promise<Task | null> {
+    @Arg('taskId', () => ID) taskId: string
+  ): Promise<void> {
     assertAuth(context)
     const task = await context.prisma.task.findFirst({
       where: {
@@ -131,45 +141,64 @@ export default class TaskResolver {
     })
     assertObject(task)
     const currentUserId = context.currentUserId as string
-    const exists = await context.prisma.userFavories.findFirst({
+    const exists = await context.prisma.userFavorites.findFirst({
       where: {
         userId: currentUserId,
         taskId
       }
     })
     if (exists) {
-      await context.prisma.userFavories.delete({
+      await context.prisma.userFavorites.delete({
         where: {
           userId: exists.userId
         }
       })
     } else {
-      await context.prisma.userFavories.create({
+      await context.prisma.userFavorites.create({
         data: {
           userId: currentUserId,
           taskId
         }
       })
     }
-    return task
   }
 
-  // @Authorized()
-  // @Query(() => [Task])
-  // async findClosestTasks(
-  //   @Ctx() context: Context,
-  //   @Arg('location', () => LocationInput) location: LocationInput
-  // ): Promise<Task[]> {
-  //   const taskLocations = await context.prisma.taskLocation.findClosestPoints(
-  //     location.latitude,
-  //     location.longitude
-  //   )
-  //   return await context.prisma.task.findMany({
-  //     where: {
-  //       id: {
-  //         in: taskLocations.map((v: TaskLocation) => v.taskId)
-  //       }
-  //     }
-  //   })
-  // }
+  @Authorized()
+  @Mutation(() => GraphQLVoid, { nullable: true })
+  async trackView(@Ctx() context: Context, @Arg('taskId', () => ID) taskId: string): Promise<void> {
+    assertAuth(context)
+    const exists = await context.prisma.taskView.findFirst({
+      where: {
+        userId: context.currentUserId,
+        taskId
+      }
+    })
+    if (!exists) {
+      await context.prisma.taskView.create({
+        data: {
+          taskId,
+          userId: context.currentUserId
+        }
+      })
+    }
+  }
+
+  @Authorized()
+  @Query(() => [Task])
+  async findClosestTasks(
+    @Ctx() context: Context,
+    @Arg('location', () => LocationInput) location: LocationInput
+  ): Promise<Task[]> {
+    const taskLocations = await context.prisma.taskLocation.findClosestPoints(
+      location.latitude,
+      location.longitude
+    )
+    return await context.prisma.task.findMany({
+      where: {
+        id: {
+          in: taskLocations.map((v: TaskLocation) => v.task)
+        }
+      }
+    })
+  }
 }

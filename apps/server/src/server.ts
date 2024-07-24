@@ -9,11 +9,11 @@ import {
 } from '@apollo/server/plugin/landingPage/default'
 import cors from 'cors'
 import express from 'express'
-import { DateTimeResolver } from 'graphql-scalars'
+import { GraphQLScalarType } from 'graphql'
+import { DateTimeResolver, GraphQLVoid } from 'graphql-scalars'
 import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs'
 import Upload from 'graphql-upload/Upload.mjs'
 import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
-// import { graphqlUploadExpress, GraphQLUpload, Upload } from 'graphql-upload'
 import { useServer } from 'graphql-ws/lib/use/ws'
 import { createServer } from 'http'
 import { makeDirectory } from 'make-dir'
@@ -66,12 +66,16 @@ async function main(): Promise<void> {
   const schema = await buildSchema({
     scalarsMap: [
       {
-        scalar: GraphQLUpload as any,
+        scalar: GraphQLUpload,
         type: Upload
       },
       {
         scalar: DateTimeResolver,
         type: Date
+      },
+      {
+        scalar: GraphQLVoid,
+        type: GraphQLScalarType
       }
     ],
     resolvers: [
